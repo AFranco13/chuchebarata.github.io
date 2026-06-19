@@ -1,5 +1,5 @@
 /* =========================================================
-   Casa Mendaro — app.js
+   Chuchebarata — app.js
    Ilustraciones SVG propias + tienda interactiva
    ========================================================= */
 
@@ -73,7 +73,7 @@ const TINTS = {
   chocolate:'var(--t-chocolate)', regaliz:'var(--t-regaliz)', chicles:'var(--t-chicles)',
   conos:'var(--t-conos)', decoracion:'var(--t-decoracion)',
 };
-const FREE_SHIPPING = 95;
+const FREE_SHIPPING = 49;
 
 /* ---- helpers ---- */
 const $  = s => document.querySelector(s);
@@ -130,7 +130,7 @@ function currentList(){
   if(q) list = list.filter(p => (p.name+' '+p.meta+' '+p.cat).toLowerCase().includes(q));
   const note = $('#resultNote');
   if(q) note.textContent = `${list.length} resultado${list.length!==1?'s':''} para «${$('#searchInput').value.trim()}».`;
-  else if(activeCat==='todo') note.textContent = 'Lo que más sale del obrador esta semana.';
+  else if(activeCat==='todo') note.textContent = 'Lo más vendido esta semana.';
   else note.textContent = `${list.length} referencia${list.length!==1?'s':''} en esta familia.`;
   return list;
 }
@@ -230,7 +230,6 @@ function initReveal(){
 
 /* ---- eventos globales (delegación) ---- */
 function bindEvents(){
-  // añadir al carrito
   document.addEventListener('click', e => {
     const add = e.target.closest('[data-add]');
     if(add){ addToCart(+add.dataset.add); return; }
@@ -255,7 +254,6 @@ function bindEvents(){
     cart = {}; updateCart(); closeCart(); showToast('Pedido de prueba realizado · ¡gracias!');
   });
 
-  // búsqueda
   $('#searchBtn').addEventListener('click', () => {
     const w = $('#searchWrap');
     w.classList.toggle('open');
@@ -263,10 +261,8 @@ function bindEvents(){
   });
   $('#searchInput').addEventListener('input', refresh);
 
-  // menú móvil (lleva al catálogo)
   $('#menuBtn').addEventListener('click', () => $('#categorias').scrollIntoView({behavior:'smooth'}));
 
-  // newsletter
   $('#newsForm').addEventListener('submit', e => {
     e.preventDefault();
     const email = $('#newsEmail').value.trim();

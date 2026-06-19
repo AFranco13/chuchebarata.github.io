@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Casa Mendaro · Confitería y mesas dulces para celebraciones</title>
+<meta name="description" content="Confitería artesana online. Golosinas, chocolate, regaliz y mesas dulces a medida para bodas, comuniones y eventos. Envío en 24-48h, gratis a partir de 95€.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="utility">
+  <div class="container utility-in">
+    <span>Envío en 24-48 h · Gratis a partir de 95&nbsp;€</span>
+    <span class="utility-right">Atención por WhatsApp · Lun&nbsp;a&nbsp;Sáb</span>
+  </div>
+</div>
+
+<header id="top">
+  <div class="container header-in">
+    <a href="#top" class="brand" aria-label="Casa Mendaro, inicio">
+      <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true">
+        <circle cx="20" cy="20" r="19" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M12 25c0-7 3-12 8-12s8 5 8 12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+        <circle cx="20" cy="13" r="2.4" fill="currentColor"/>
+      </svg>
+      <span class="brand-name">Casa&nbsp;Mendaro</span>
+    </a>
+
+    <nav class="nav" aria-label="Principal">
+      <a href="#categorias">Catálogo</a>
+      <a href="#tienda">Golosinas</a>
+      <a href="#eventos">Mesas dulces</a>
+      <a href="#valores">Sobre el obrador</a>
+    </nav>
+
+    <div class="header-tools">
+      <button class="tool" id="searchBtn" aria-label="Buscar">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><line x1="16.5" y1="16.5" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <button class="tool cart-toggle" id="cartBtn" aria-label="Abrir carrito">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14l-1.2 10.5a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8L5 7Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 7a3 3 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+        <span class="cart-count" id="cartCount">0</span>
+      </button>
+      <button class="tool menu-toggle" id="menuBtn" aria-label="Menú">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="4" y1="8" x2="20" y2="8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="4" y1="16" x2="20" y2="16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="searchwrap" id="searchWrap">
+    <div class="container">
+      <input type="text" id="searchInput" placeholder="Buscar en el catálogo: gominolas, regaliz, chocolate…" autocomplete="off">
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container hero-grid">
+    <div class="hero-copy reveal">
+      <p class="eyebrow">Confitería artesana · desde 1998</p>
+      <h1>Lo dulce, <span class="ital">bien hecho</span>, para tus celebraciones.</h1>
+      <p class="lead">Seleccionamos golosinas, chocolate y regaliz de calidad y montamos la mesa dulce de tu evento. Sin neón, sin prisas, con buen gusto.</p>
+      <div class="hero-cta">
+        <a href="#tienda" class="btn btn-primary">Ver el catálogo</a>
+        <a href="#eventos" class="btn btn-ghost">Montar una mesa dulce</a>
+      </div>
+      <div class="hero-proof">
+        <div class="stars" aria-hidden="true">
+          <svg viewBox="0 0 20 20"><path d="M10 1l2.6 5.3 5.9.9-4.2 4.1 1 5.8L10 14.8 4.7 17.6l1-5.8L1.5 7.7l5.9-.9z"/></svg>
+          <svg viewBox="0 0 20 20"><path d="M10 1l2.6 5.3 5.9.9-4.2 4.1 1 5.8L10 14.8 4.7 17.6l1-5.8L1.5 7.7l5.9-.9z"/></svg>
+          <svg viewBox="0 0 20 20"><path d="M10 1l2.6 5.3 5.9.9-4.2 4.1 1 5.8L10 14.8 4.7 17.6l1-5.8L1.5 7.7l5.9-.9z"/></svg>
+          <svg viewBox="0 0 20 20"><path d="M10 1l2.6 5.3 5.9.9-4.2 4.1 1 5.8L10 14.8 4.7 17.6l1-5.8L1.5 7.7l5.9-.9z"/></svg>
+          <svg viewBox="0 0 20 20"><path d="M10 1l2.6 5.3 5.9.9-4.2 4.1 1 5.8L10 14.8 4.7 17.6l1-5.8L1.5 7.7l5.9-.9z"/></svg>
+        </div>
+        <p><strong>4,9 / 5</strong> · 2.300+ pedidos servidos</p>
+      </div>
+    </div>
+
+    <div class="hero-visual reveal">
+      <svg class="jar" viewBox="0 0 220 240" role="img" aria-label="Tarro de cristal lleno de golosinas surtidas">
+        <defs>
+          <clipPath id="jarClip"><path d="M52 64 L168 64 L172 210 Q172 220 162 220 L58 220 Q48 220 48 210 Z"/></clipPath>
+        </defs>
+        <rect x="62" y="18" width="96" height="24" rx="9" fill="#6E1A3C"/>
+        <rect x="70" y="9" width="80" height="14" rx="6" fill="#8A2350"/>
+        <path d="M50 58 Q50 50 60 50 L160 50 Q170 50 170 58 L174 210 Q174 224 160 224 L60 224 Q46 224 46 210 Z" fill="#FBF3EF" stroke="#E4D0C6" stroke-width="3"/>
+        <g clip-path="url(#jarClip)">
+          <circle cx="68" cy="190" r="13" fill="#C2375F"/>
+          <circle cx="98" cy="200" r="15" fill="#E0913B"/>
+          <circle cx="132" cy="192" r="13" fill="#6FA98E"/>
+          <circle cx="158" cy="200" r="12" fill="#7A4B8F"/>
+          <circle cx="62" cy="208" r="11" fill="#D9B23E"/>
+          <circle cx="118" cy="210" r="12" fill="#C2375F"/>
+          <circle cx="150" cy="212" r="10" fill="#E0913B"/>
+          <circle cx="84" cy="168" r="12" fill="#7A4B8F"/>
+          <circle cx="112" cy="172" r="13" fill="#D9B23E"/>
+          <circle cx="142" cy="166" r="12" fill="#C2375F"/>
+          <circle cx="66" cy="160" r="11" fill="#6FA98E"/>
+          <circle cx="160" cy="178" r="10" fill="#E89BB0"/>
+          <circle cx="98" cy="146" r="13" fill="#E0913B"/>
+          <circle cx="128" cy="142" r="12" fill="#6FA98E"/>
+          <circle cx="74" cy="138" r="11" fill="#D9B23E"/>
+          <circle cx="150" cy="146" r="11" fill="#7A4B8F"/>
+          <circle cx="110" cy="120" r="12" fill="#C2375F"/>
+          <circle cx="140" cy="118" r="10" fill="#E89BB0"/>
+          <circle cx="82" cy="116" r="10" fill="#6FA98E"/>
+        </g>
+        <rect x="60" y="74" width="9" height="120" rx="4.5" fill="#fff" opacity=".55"/>
+      </svg>
+
+      <div class="chip chip-a reveal">
+        <span class="chip-art" id="chipArtA"></span>
+        <div><b>Surtido del obrador</b><small>Bolsa 1&nbsp;kg · 3,40&nbsp;€</small></div>
+      </div>
+      <div class="chip chip-b reveal">
+        <span class="chip-art" id="chipArtB"></span>
+        <div><b>Cono para repartir</b><small>desde 0,65&nbsp;€</small></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BENEFITS -->
+<div class="container">
+  <ul class="benefits reveal">
+    <li>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="1.5" y="6" width="13" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M14.5 9h4l3 3v4h-7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="6" cy="18" r="2" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="17" cy="18" r="2" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+      <div><b>Entrega en 24-48 h</b><span>Preparado el mismo día</span></div>
+    </li>
+    <li>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 3 6v6c0 5 4 8 9 10 5-2 9-5 9-10V6l-9-4Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8.5 12l2.5 2.5 4.5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div><b>Pago seguro</b><span>Tarjeta, PayPal y Bizum</span></div>
+    </li>
+    <li>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18v11H8l-4 4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><line x1="7" y1="9" x2="17" y2="9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="7" y1="12.5" x2="13" y2="12.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <div><b>Te asesoramos</b><span>Por chat o WhatsApp</span></div>
+    </li>
+    <li>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c2.5 0 4 1.8 4 4 0 3-4 5-4 9 0-4-4-6-4-9 0-2.2 1.5-4 4-4Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="7" r="1.4" fill="currentColor"/></svg>
+      <div><b>Apto para alérgicos</b><span>Sin gluten, lactosa ni huevo</span></div>
+    </li>
+  </ul>
+</div>
+
+<!-- CATEGORIES -->
+<section id="categorias" class="section">
+  <div class="container">
+    <div class="section-head reveal">
+      <div>
+        <p class="kicker">El catálogo</p>
+        <h2>Por familia de producto</h2>
+      </div>
+      <p class="section-sub">Ocho familias, una misma exigencia. Filtra la tienda con un clic.</p>
+    </div>
+    <div class="cat-grid" id="catGrid"></div>
+  </div>
+</section>
+
+<!-- PRODUCTS -->
+<section id="tienda" class="section section-tight">
+  <div class="container">
+    <div class="section-head reveal">
+      <div>
+        <p class="kicker">La tienda</p>
+        <h2>Selección de temporada</h2>
+      </div>
+      <p class="section-sub" id="resultNote">Lo que más sale del obrador esta semana.</p>
+    </div>
+    <div class="filters reveal" id="filters"></div>
+    <div class="product-grid" id="productGrid"></div>
+  </div>
+</section>
+
+<!-- EVENTS -->
+<section id="eventos" class="section">
+  <div class="container">
+    <div class="events reveal">
+      <div class="events-text">
+        <p class="kicker light">Para tu celebración</p>
+        <h2>Montamos tu mesa dulce a medida</h2>
+        <p>Dinos cuántos invitados y la ocasión. Calculamos cantidades, combinamos colores y lo servimos listo para presentar: conos, cestas, brochetas y packs completos para bodas, comuniones y empresa.</p>
+        <a href="#" class="btn btn-light" data-filter="eventos">Ver propuestas para eventos</a>
+      </div>
+      <div class="events-cards" id="eventCards"></div>
+    </div>
+  </div>
+</section>
+
+<!-- VALUES -->
+<section id="valores" class="section section-tight">
+  <div class="container">
+    <div class="section-head reveal">
+      <div>
+        <p class="kicker">Sobre el obrador</p>
+        <h2>Por qué Casa Mendaro</h2>
+      </div>
+    </div>
+    <div class="values reveal">
+      <article>
+        <h3>Producto seleccionado</h3>
+        <p>Trabajamos con fabricantes de confianza y catamos cada referencia antes de incluirla. Si no nos gusta, no entra en el catálogo.</p>
+      </article>
+      <article>
+        <h3>Pensado para alérgicos</h3>
+        <p>El mayor surtido sin gluten, lactosa ni huevo del sector, marcado con claridad en cada ficha para que nadie se quede fuera.</p>
+      </article>
+      <article>
+        <h3>Una persona detrás</h3>
+        <p>Detrás de cada pedido hay un equipo pequeño que responde de verdad. Escríbenos y te ayudamos a acertar con tu compra.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- NEWSLETTER -->
+<section class="section section-tight">
+  <div class="container">
+    <div class="newsletter reveal">
+      <div>
+        <h2>Un 10 % en tu primer pedido</h2>
+        <p>Recibe novedades de temporada y ofertas, sin saturar tu bandeja de entrada.</p>
+      </div>
+      <form id="newsForm" novalidate>
+        <input type="email" id="newsEmail" placeholder="tu@correo.com" aria-label="Tu correo" required>
+        <button type="submit" class="btn btn-primary">Suscribirme</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <a href="#top" class="brand">
+        <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M12 25c0-7 3-12 8-12s8 5 8 12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="20" cy="13" r="2.4" fill="currentColor"/></svg>
+        <span class="brand-name">Casa&nbsp;Mendaro</span>
+      </a>
+      <p>Confitería artesana online y mesas dulces para celebraciones. Lo dulce, bien hecho.</p>
+      <div class="socials">
+        <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor"/></svg></a>
+        <a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M14 8h2.5V5H14c-2 0-3.5 1.5-3.5 3.5V10H8v3h2.5v8h3v-8H16l.5-3h-3V8.7c0-.4.3-.7.7-.7Z" fill="currentColor"/></svg></a>
+        <a href="#" aria-label="WhatsApp"><svg viewBox="0 0 24 24"><path d="M4 20l1.3-4A8 8 0 1 1 8 18.7L4 20Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></a>
+      </div>
+    </div>
+    <nav class="footer-col" aria-label="Tienda">
+      <h4>Tienda</h4>
+      <a href="#tienda">Gominolas</a>
+      <a href="#tienda">Chocolate</a>
+      <a href="#tienda">Regaliz</a>
+      <a href="#eventos">Conos y cestas</a>
+      <a href="#categorias">Decoración</a>
+    </nav>
+    <nav class="footer-col" aria-label="Ayuda">
+      <h4>Ayuda</h4>
+      <a href="#">Envíos y entregas</a>
+      <a href="#">Devoluciones</a>
+      <a href="#">Pago seguro</a>
+      <a href="#">Contacto</a>
+    </nav>
+    <nav class="footer-col" aria-label="Información">
+      <h4>Información</h4>
+      <a href="#">Sobre nosotros</a>
+      <a href="#">Aviso legal</a>
+      <a href="#">Términos y condiciones</a>
+      <a href="#">Política de cookies</a>
+    </nav>
+  </div>
+  <div class="container footer-bottom">
+    <span>© 2026 Casa Mendaro · Maqueta de demostración (concepto original, no comercial)</span>
+    <span>Diseño y desarrollo propio</span>
+  </div>
+</footer>
+
+<!-- CART -->
+<div class="scrim" id="scrim"></div>
+<aside class="cart" id="cart" aria-label="Carrito de compra">
+  <div class="cart-head">
+    <h3>Tu pedido</h3>
+    <button class="cart-close" id="cartClose" aria-label="Cerrar">
+      <svg viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="ship">
+    <p id="shipMsg"></p>
+    <div class="ship-track"><div class="ship-fill" id="shipFill"></div></div>
+  </div>
+  <div class="cart-items" id="cartItems"></div>
+  <div class="cart-foot">
+    <div class="cart-total"><span>Total · IVA incl.</span><b id="cartTotal">0,00 €</b></div>
+    <button class="btn btn-primary btn-block" id="checkoutBtn">Tramitar pedido</button>
+  </div>
+</aside>
+
+<div class="toast" id="toast"><span id="toastMsg"></span></div>
+
+<script src="app.js" defer></script>
+</body>
+</html>

@@ -178,7 +178,7 @@ function updateMeta(p) {
   const title = `${p.nombre} · Chuches baratas | El Kiosquillo`;
   const desc = p.desc_short || `Compra ${p.nombre} al mejor precio en El Kiosquillo. Chuches baratas online con envío en 24-48h.`;
   const url = `${SITE_BASE}/producto.html?id=${p.id}`;
-  const image = p.img ? `${SITE_BASE}/${p.img}` : `${SITE_BASE}/images/productos/mesa-dulce-rosa.jpg`;
+  const image = p.img ? `${SITE_BASE}/${p.img}` : `${SITE_BASE}/images/og-cover.png`;
 
   document.title = title;
   setAttr('pageDesc', 'content', desc);

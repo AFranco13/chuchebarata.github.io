@@ -43,22 +43,28 @@ const CATEGORIES = [
 ];
 
 const PRODUCTS = [
-  { id:1,  name:'Ositos de fruta',        cat:'gominolas', art:'bear',     price:3.40, old:3.95, tag:'oferta', meta:'Bolsa 1 kg · surtido clásico', allergen:true },
-  { id:2,  name:'Aros de fresa ácidos',   cat:'gominolas', art:'wrapped',  price:3.90,           tag:'top',    meta:'Bolsa 1 kg · pica',            allergen:true },
-  { id:3,  name:'Botellas de cola',       cat:'gominolas', art:'gum',      price:3.50,           meta:'Bolsa 1 kg · sabor original',  allergen:true },
-  { id:4,  name:'Nubes de colores',       cat:'nubes',     art:'nube',     price:2.80,           tag:'nuevo',  meta:'Bolsa 900 g · esponjitas',     allergen:true },
-  { id:5,  name:'Nubes con chocolate',    cat:'nubes',     art:'bonbon',   price:4.20,           meta:'Bañadas en chocolate con leche', allergen:false },
-  { id:6,  name:'Piruletas de espiral',   cat:'caramelos', art:'lolly',    price:0.60,           tag:'top',    meta:'Unidad · colores surtidos',    allergen:true },
-  { id:7,  name:'Caramelos masticables',  cat:'caramelos', art:'wrapped',  price:2.95,           meta:'Bolsa 1 kg · frutas',          allergen:true },
-  { id:8,  name:'Mini tabletas surtidas', cat:'chocolate', art:'choc',     price:5.50, old:6.50, tag:'oferta', meta:'Caja 30 ud · para repartir',   allergen:false },
-  { id:9,  name:'Bombones del obrador',   cat:'chocolate', art:'bonbon',   price:7.90,           meta:'Estuche 250 g · regalo',       allergen:false },
-  { id:10, name:'Regaliz rojo trenzado',  cat:'regaliz',   art:'licorice', price:3.20,           meta:'Bolsa 1 kg · dulce',           allergen:true },
-  { id:11, name:'Surtido de allsorts',    cat:'regaliz',   art:'licorice', price:3.30,           tag:'nuevo',  meta:'Bolsa 1 kg · capas clásicas',  allergen:true },
-  { id:12, name:'Bolas de chicle',        cat:'chicles',   art:'gum',      price:4.10,           meta:'Bolsa 1 kg · colores',         allergen:true },
-  { id:13, name:'Cono para repartir',     cat:'conos',     art:'cone',     price:0.68,           tag:'oferta', meta:'Unidad · sin gluten',          allergen:true },
-  { id:14, name:'Cesta gigante regalo',   cat:'conos',     art:'gift',     price:38.95,          tag:'top',    meta:'40 cm · rellena a mano',       allergen:false },
-  { id:15, name:'Brocheta de gominolas',  cat:'conos',     art:'cone',     price:1.50,           meta:'Unidad · para la mesa dulce',  allergen:true },
-  { id:16, name:'Cartucho XXL 1,5 m',     cat:'conos',     art:'gift',     price:36.95,          meta:'Chocolatinas tamaño gigante',  allergen:false },
+  { id:1,  name:'Taco Relleno Regaliz 1 kg Fini',                  cat:'regaliz',   art:'licorice', img:'images/productos/taco-relleno-regaliz-1-kg-fini.jpg',                    price:10.69, tag:'top',    meta:'1 kg · regaliz surtido Fini' },
+  { id:2,  name:'Ranas gigantes brillo 1 kg Fini',                 cat:'gominolas', art:'bear',     img:'images/productos/ranas-gigantes-brillo-1-kg-fini.jpg',                   price:6.59,  tag:'top',    meta:'1 kg · gominolas brillo' },
+  { id:3,  name:'Crunchy Asteroides Surtidos 1 kg Burmar',         cat:'gominolas', art:'bear',     img:'images/productos/crunchy-asteroides-surtidos-1-kg-burmar.jpg',           price:10.39,              meta:'1 kg · surtido crujiente' },
+  { id:4,  name:'Piruletas Corazón 110 ud Cerdan',                 cat:'caramelos', art:'lolly',    img:'images/productos/piruletas-corazon-110-ud-cerdan.jpg',                   price:10.09,              meta:'110 ud · corazón de fresa' },
+  { id:5,  name:'Smint Tabs Menta 12 ud',                          cat:'caramelos', art:'wrapped',  img:'images/productos/smint-tabs-menta-12-ud.jpg',                            price:23.69,              meta:'12 ud · sin azúcar' },
+  { id:6,  name:'Cereza envuelta gragea 80 g (12 ud) Fini',        cat:'gominolas', art:'bear',     img:'images/productos/cereza-envuelta-gragea-80-g-12-ud-fini.jpg',            price:11.19,              meta:'12 ud · cereza con gragea' },
+  { id:7,  name:'Orbit Refreshers Hierbabuena (16 ud)',            cat:'chicles',   art:'gum',      img:'images/productos/orbit-refreshers-hierbabuena-16-ud.jpg',                price:21.29,              meta:'16 ud · sin azúcar' },
+  { id:8,  name:'Sobres Soda Unicornios Fresa Plátano (40 ud)',    cat:'caramelos', art:'wrapped',  img:'images/productos/sobres-soda-unicornios-fresa-platano-40-ud-cerdan.jpg',  price:9.79,               meta:'40 ud · pica pica' },
+  { id:9,  name:'Orbit Refreshers Tropical (16 ud)',               cat:'chicles',   art:'gum',      img:'images/productos/orbit-refreshers-tropical-16-ud.jpg',                   price:21.29,              meta:'16 ud · sin azúcar' },
+  { id:10, name:'Mesa Dulce Rosa',                                  cat:'conos',     art:'gift',     img:'images/productos/mesa-dulce-rosa.jpg',                                   price:55.79, tag:'top',    meta:'Lista para usar · candy bar' },
+  { id:11, name:'Oreo Doble Crema 157 g (16 ud)',                  cat:'chocolate', art:'choc',     img:'images/productos/oreo-doble-crema-157-g-16-ud.jpg',                      price:30.59,              meta:'16 ud · doble relleno' },
+  { id:12, name:'Panna Fragola 200 ud Fini',                       cat:'chicles',   art:'gum',      img:'images/productos/panna-fragola-200-ud-fini.jpg',                         price:10.89,              meta:'200 ud · sabor fresa' },
+  { id:13, name:'Caramelo relleno de miel 1 kg Gerio',             cat:'caramelos', art:'wrapped',  img:'images/productos/caramelo-relleno-de-miel-1-kg-gerio.jpg',               price:11.59,              meta:'1 kg · relleno de miel' },
+  { id:14, name:'Taco Lápiz Nata Fresa 1 kg King Regal',           cat:'regaliz',   art:'licorice', img:'images/productos/taco-lapiz-nata-fresa-1-kg-king-regal.jpg',             price:6.19,               meta:'1 kg · nata y fresa' },
+  { id:15, name:'Sobres Soda Dinos Lima Limón (40 ud)',            cat:'caramelos', art:'wrapped',  img:'images/productos/sobres-soda-dinos-lima-limon-40-ud-cerdan.jpg',          price:9.79,               meta:'40 ud · pica lima limón' },
+  { id:16, name:'Lágrimas de eucalipto 1 kg Damel',               cat:'gominolas', art:'bear',     img:'images/productos/lagrimas-de-eucalipto-1-kg-damel.jpg',                  price:5.99,               meta:'1 kg · sabor eucalipto' },
+  { id:17, name:'Barrita Jungly 34 g (30 ud) Nestlé',             cat:'chocolate', art:'choc',     img:'images/productos/barrita-jungly-34-g-30-ud-nestle.jpg',                  price:18.49,              meta:'30 ud · chocolate con leche' },
+  { id:18, name:'Macedonia 250 ud Fini',                           cat:'chicles',   art:'gum',      img:'images/productos/macedonia-250-ud-fini.jpg',                             price:11.49,              meta:'250 ud · frutas surtidas' },
+  { id:19, name:'Mesa Dulce Azul',                                  cat:'conos',     art:'gift',     img:'images/productos/mesa-dulce-azul.jpg',                                   price:51.09, tag:'oferta', meta:'Lista para usar · candy bar' },
+  { id:20, name:'Aros fresa pica 1 kg Fini',                       cat:'gominolas', art:'bear',     img:'images/productos/aros-fresa-pica-1-kg-fini.jpg',                         price:5.39,               meta:'1 kg · pica pica fresa' },
+  { id:21, name:'Burguer Gum 200 ud Fini',                         cat:'chicles',   art:'gum',      img:'images/productos/burguer-gum-200-ud-fini.jpg',                           price:12.59,              meta:'200 ud · sabor hamburguesa' },
+  { id:22, name:'Snack Crunch 33 g (30 ud) Nestlé',               cat:'chocolate', art:'choc',     img:'images/productos/snack-crunch-33-g-30-ud-nestle.jpg',                    price:18.49,              meta:'30 ud · chocolate crujiente' },
 ];
 
 const EVENTS = [
@@ -110,9 +116,11 @@ function renderProducts(list){
   grid.innerHTML = list.map(p => `
     <article class="product">
       ${p.tag ? `<span class="product-tag ${p.tag}">${p.tag==='oferta'?'Oferta':p.tag==='nuevo'?'Novedad':'Más vendido'}</span>`:''}
-      <div class="product-thumb" style="background:${TINTS[p.cat]}">${ART[p.art]}</div>
+      <a href="producto.html?id=${p.id}" class="product-link" aria-label="Ver detalle de ${p.name}">
+        <div class="product-thumb" style="background:${TINTS[p.cat]}">${p.img ? `<img src="${p.img}" alt="${p.name}" loading="lazy">` : ART[p.art]}</div>
+      </a>
       <div class="product-body">
-        <h3>${p.name}</h3>
+        <h3><a href="producto.html?id=${p.id}" class="product-name-link">${p.name}</a></h3>
         <p class="meta">${p.meta}</p>
         ${p.allergen ? `<span class="allergen">● Sin gluten</span>` : ''}
         <div class="product-foot">
@@ -158,10 +166,15 @@ function renderChips(){
 }
 
 /* ---- carrito ---- */
+function findProduct(id){
+  return PRODUCTS.find(x => x.id === id)
+    || (typeof PRODUCTOS_DATA !== 'undefined' && PRODUCTOS_DATA.find(x => x.id === id && (x.nombre||x.name) && { ...x, name: x.nombre, price: x.price }))
+    || null;
+}
 function addToCart(id){
   cart[id] = (cart[id]||0) + 1;
-  const p = PRODUCTS.find(x => x.id === id);
-  showToast(`${p.name} · añadido`);
+  const p = findProduct(id);
+  showToast(`${p ? (p.name||p.nombre) : 'Producto'} · añadido`);
   bump();
   updateCart();
 }
@@ -187,7 +200,7 @@ function updateCart(){
     const p = PRODUCTS.find(x => x.id == id);
     const q = cart[id]; total += p.price * q;
     return `<div class="ci">
-      <span class="ci-art" style="background:${TINTS[p.cat]}">${ART[p.art]}</span>
+      <span class="ci-art" style="background:${TINTS[p.cat]}">${p.img ? `<img src="${p.img}" alt="${p.name}">` : ART[p.art]}</span>
       <div class="ci-info"><b>${p.name}</b><span>${eur(p.price*q)}</span></div>
       <div class="qty"><button data-q="-1" data-id="${id}" aria-label="Quitar uno">−</button><span>${q}</span><button data-q="1" data-id="${id}" aria-label="Añadir uno">+</button></div>
     </div>`;
@@ -241,7 +254,8 @@ function bindEvents(){
     if(filter){
       e.preventDefault();
       setCat(filter.dataset.filter);
-      $('#tienda').scrollIntoView({behavior:'smooth'});
+      const tienda = $('#tienda');
+      if(tienda) tienda.scrollIntoView({behavior:'smooth'});
       return;
     }
   });
@@ -259,11 +273,15 @@ function bindEvents(){
     w.classList.toggle('open');
     if(w.classList.contains('open')) $('#searchInput').focus();
   });
-  $('#searchInput').addEventListener('input', refresh);
+  if($('#searchInput')) $('#searchInput').addEventListener('input', refresh);
 
-  $('#menuBtn').addEventListener('click', () => $('#categorias').scrollIntoView({behavior:'smooth'}));
+  if($('#menuBtn')) $('#menuBtn').addEventListener('click', () => {
+    const cat = $('#categorias');
+    if(cat) cat.scrollIntoView({behavior:'smooth'});
+    else window.location.href = 'index.html#categorias';
+  });
 
-  $('#newsForm').addEventListener('submit', e => {
+  if($('#newsForm')) $('#newsForm').addEventListener('submit', e => {
     e.preventDefault();
     const email = $('#newsEmail').value.trim();
     if(!email || !email.includes('@')){ showToast('Introduce un correo válido'); return; }
@@ -276,11 +294,11 @@ function bindEvents(){
 
 /* ---- init ---- */
 document.addEventListener('DOMContentLoaded', () => {
-  renderCategories();
-  renderFilters();
-  renderEvents();
-  renderChips();
-  refresh();
+  if ($('#catGrid'))     renderCategories();
+  if ($('#filters'))    renderFilters();
+  if ($('#eventCards')) renderEvents();
+  if ($('#chipArtA'))   renderChips();
+  if ($('#productGrid')) refresh();
   updateCart();
   bindEvents();
   initReveal();

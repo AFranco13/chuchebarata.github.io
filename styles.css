@@ -167,9 +167,12 @@ header{position:sticky;top:0;z-index:50;background:rgba(251,244,239,.85);backdro
 .product-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
 .product{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column;transition:transform .2s var(--ease),box-shadow .2s var(--ease)}
 .product:hover{transform:translateY(-5px);box-shadow:var(--shadow)}
-.product-thumb{aspect-ratio:1.12;display:grid;place-items:center;position:relative}
+.product-thumb{aspect-ratio:1.12;display:grid;place-items:center;position:relative;overflow:hidden}
 .product-thumb svg{width:48%;transition:transform .35s var(--ease)}
 .product:hover .product-thumb svg{transform:scale(1.08) rotate(-4deg)}
+.product-thumb img{width:100%;height:100%;object-fit:contain;padding:10%;transition:transform .35s var(--ease)}
+.product:hover .product-thumb img{transform:scale(1.06)}
+.ci-art img{width:100%;height:100%;object-fit:contain;border-radius:8px;padding:4px}
 .product-tag{position:absolute;top:12px;left:12px;font-family:var(--sans);font-weight:800;font-size:.68rem;letter-spacing:.04em;text-transform:uppercase;padding:5px 10px;border-radius:6px;background:var(--ink);color:#fff}
 .product-tag.oferta{background:var(--wine)}
 .product-tag.nuevo{background:var(--pistachio)}
@@ -187,6 +190,9 @@ header{position:sticky;top:0;z-index:50;background:rgba(251,244,239,.85);backdro
 .add:hover{background:var(--wine);border-color:var(--wine);color:#fff}
 .empty-grid{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--muted)}
 .empty-grid b{display:block;font-family:var(--display);color:var(--ink);font-size:1.2rem;margin-bottom:4px}
+.product-link{display:block;text-decoration:none;color:inherit}
+.product-name-link{text-decoration:none;color:inherit;transition:color .16s}
+.product-name-link:hover{color:var(--wine)}
 
 /* ---------- events ---------- */
 .events{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;background:var(--wine);color:#F6E9EE;border-radius:24px;padding:52px}
@@ -271,6 +277,113 @@ footer .brand-mark{color:#E8B98A}
 .reveal{opacity:0;transform:translateY(18px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
 .reveal.in{opacity:1;transform:none}
 
+/* ---------- nav current page ---------- */
+.nav a[aria-current="page"],.nav a[aria-current="page"]:hover{color:var(--wine)}
+.nav a[aria-current="page"]::after{width:100%}
+
+/* ── CAJA HERO BAND ────────────────────────────────────────── */
+.caja-hero-band{
+  position:relative;overflow:hidden;
+  background:linear-gradient(150deg,var(--blush) 0%,#fff 65%);
+  border-bottom:1px solid var(--line);
+  padding:72px 0 64px;text-align:center
+}
+.caja-hero-band::before{
+  content:"";position:absolute;width:380px;height:380px;border-radius:50%;
+  background:var(--t-gominolas);opacity:.55;top:-130px;right:-90px;pointer-events:none
+}
+.caja-hero-band::after{
+  content:"";position:absolute;width:260px;height:260px;border-radius:50%;
+  background:var(--t-caramelos);opacity:.45;bottom:-90px;left:-60px;pointer-events:none
+}
+.caja-pills-row{
+  display:flex;justify-content:center;gap:8px;flex-wrap:wrap;
+  margin-bottom:28px;position:relative;z-index:1
+}
+.caja-pill{
+  font-family:var(--sans);font-weight:700;font-size:.74rem;
+  letter-spacing:.05em;text-transform:uppercase;
+  padding:6px 15px;border-radius:999px;color:var(--ink)
+}
+.caja-hero-band .caja-hero{position:relative;z-index:1}
+.caja-hero-band h2{font-size:var(--s4);margin-bottom:16px}
+.caja-hero-band h2 .ital{font-style:italic;color:var(--wine);font-weight:500}
+
+/* ── CAJA RESULT SECTION ───────────────────────────────────── */
+.caja-result-section{padding:0}
+
+/* ── CAJA SUGERENCIAS ──────────────────────────────────────── */
+.caja-sugerencias{background:var(--surface);border-top:1px solid var(--line)}
+.caja-sugerencias .section-head h2{font-size:var(--s3)}
+
+/* ── CAJA SURTIDA ──────────────────────────────────────────── */
+.caja-hero{max-width:560px;margin:0 auto;text-align:center}
+.caja-lead{color:var(--muted);font-size:1.05rem;line-height:1.65;margin-bottom:32px}
+.caja-form{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
+.caja-amount-wrap{
+  display:flex;align-items:center;background:#fff;
+  border:1.5px solid var(--line-strong);border-radius:var(--r-sm);
+  height:50px;padding:0 16px;gap:6px
+}
+.caja-amount-wrap input{
+  border:none;outline:none;font-size:1.15rem;font-weight:700;
+  font-family:var(--display);width:72px;color:var(--ink);
+  text-align:right;background:transparent;
+  -moz-appearance:textfield
+}
+.caja-amount-wrap input::-webkit-inner-spin-button,
+.caja-amount-wrap input::-webkit-outer-spin-button{-webkit-appearance:none}
+.caja-amount-wrap span{color:var(--muted);font-family:var(--display);font-size:1.05rem;font-weight:600}
+
+.caja-result{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--r);padding:28px 32px;max-width:680px;margin:48px auto 64px
+}
+.caja-result-head{
+  display:flex;align-items:baseline;justify-content:space-between;
+  gap:16px;margin-bottom:20px;flex-wrap:wrap
+}
+.caja-result-head h3{font-family:var(--display);font-size:1.1rem;font-weight:600}
+.caja-total-line{display:flex;align-items:baseline;gap:6px;font-size:.95rem}
+.caja-total-line span:first-child{font-family:var(--display);font-weight:700;font-size:1.15rem;color:var(--ink);transition:color .2s}
+.caja-budget-ref{color:var(--muted)}
+.caja-total-over span:first-child{color:var(--wine)}
+
+.caja-items{display:flex;flex-direction:column;gap:8px;margin-bottom:24px;min-height:52px}
+.caja-empty{color:var(--muted);text-align:center;padding:16px 0;font-size:.93rem}
+.caja-item{
+  display:flex;align-items:center;gap:13px;
+  padding:9px 12px;background:var(--bg);
+  border:1px solid var(--line);border-radius:var(--r-sm);
+  transition:opacity .18s
+}
+.caja-item-thumb{
+  width:44px;height:44px;border-radius:8px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;overflow:hidden
+}
+.caja-item-thumb img{width:100%;height:100%;object-fit:contain;padding:5px}
+.caja-item-name{flex:1;font-size:.92rem;font-weight:500;line-height:1.3;min-width:0}
+.caja-item-price{font-family:var(--display);font-weight:700;font-size:.95rem;color:var(--ink);flex-shrink:0}
+.caja-item-remove{
+  width:28px;height:28px;border:none;background:none;cursor:pointer;
+  color:var(--muted);display:flex;align-items:center;justify-content:center;
+  border-radius:50%;flex-shrink:0;padding:0;
+  transition:background .15s,color .15s
+}
+.caja-item-remove:hover{background:#FBE8E8;color:var(--wine)}
+
+.caja-actions{
+  display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+  padding-top:20px;border-top:1px solid var(--line)
+}
+.caja-add-row{display:flex;gap:8px;flex:1;min-width:180px}
+.caja-add-row select{
+  flex:1;min-width:0;height:44px;
+  border:1.5px solid var(--line-strong);border-radius:var(--r-sm);
+  padding:0 10px;font-size:.87rem;color:var(--ink);
+  background:#fff;cursor:pointer;font-family:var(--sans)
+}
+
 /* ---------- responsive ---------- */
 @media(max-width:980px){
   .hero-grid{grid-template-columns:1fr;gap:24px}
@@ -283,6 +396,7 @@ footer .brand-mark{color:#E8B98A}
   .product-grid{grid-template-columns:repeat(3,1fr)}
   .events{grid-template-columns:1fr;gap:30px;padding:40px}
   .values{grid-template-columns:1fr}
+  .caja-result{padding:24px 20px}
   .newsletter{grid-template-columns:1fr;gap:22px}
   .footer-grid{grid-template-columns:1fr 1fr}
 }
@@ -298,9 +412,14 @@ footer .brand-mark{color:#E8B98A}
   .footer-grid{grid-template-columns:1fr 1fr;gap:26px}
   .footer-bottom{flex-direction:column;text-align:center}
   .newsletter{padding:32px}
+  .caja-hero-band{padding:52px 0 48px}
+  .caja-sugerencias .section-head{flex-direction:row;align-items:center}
+  .caja-sugerencias .section-head h2{font-size:var(--s2)}
 }
 @media(max-width:460px){
   .container{padding:0 18px}
+  .caja-actions{flex-direction:column;align-items:stretch}
+  .caja-add-row{min-width:0}
   .benefits{grid-template-columns:1fr}
   .benefits li{border-right:none;border-bottom:1px solid var(--line)}
   .benefits li:last-child{border-bottom:none}

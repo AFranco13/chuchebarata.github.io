@@ -243,6 +243,12 @@
   .pd-gallery { position: static; }
 }
 @media (max-width: 480px) {
+  .pd-layout { padding-top: 16px; padding-bottom: 48px; gap: 20px; }
+  .pd-title { font-size: 1.5rem; }
+  .pd-price { font-size: 1.8rem; }
   .pd-actions { flex-wrap: wrap; }
-  .pd-add { min-width: 100%; }
+  .pd-add { min-width: 100%; order: 2; }
+  .pd-qty { order: 1; }
+  .pd-badge-row { gap: 6px; }
+  .pd-img-main { padding: 20px; }
 }

@@ -225,11 +225,26 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCart(); });
 
-  /* búsqueda (solo abre/cierra el panel, no filtra en esta página) */
+  /* búsqueda */
   const searchBtn = $('#searchBtn');
   if (searchBtn) searchBtn.addEventListener('click', () => {
     const w = $('#searchWrap');
     if (w) { w.classList.toggle('open'); if (w.classList.contains('open')) $('#searchInput').focus(); }
+  });
+
+  /* menú móvil */
+  const menuBtn = $('#menuBtn');
+  if (menuBtn) menuBtn.addEventListener('click', () => {
+    const nav = $('#mobileNav');
+    if (!nav) return;
+    const isOpen = nav.classList.toggle('open');
+    menuBtn.setAttribute('aria-expanded', String(isOpen));
+  });
+  document.addEventListener('click', e => {
+    if (e.target.closest('.mobile-nav a')) {
+      const nav = $('#mobileNav');
+      if (nav) { nav.classList.remove('open'); if (menuBtn) menuBtn.setAttribute('aria-expanded', 'false'); }
+    }
   });
 
   /* caja surtida */

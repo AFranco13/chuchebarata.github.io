@@ -109,6 +109,7 @@ function renderFilters(){
 /* ---- productos ---- */
 function renderProducts(list){
   const grid = $('#productGrid');
+  if(!grid) return;
   if(!list.length){
     grid.innerHTML = `<div class="empty-grid"><b>Sin resultados</b>Prueba con otra familia o término de búsqueda.</div>`;
     return;
@@ -133,7 +134,7 @@ function renderProducts(list){
 
 function currentList(){
   let list = PRODUCTS;
-  const q = $('#searchInput').value.trim().toLowerCase();
+  const q = ($('#searchInput') ? $('#searchInput').value.trim() : '').toLowerCase();
   if(activeCat !== 'todo') list = list.filter(p => p.cat === activeCat);
   if(q) list = list.filter(p => (p.name+' '+p.meta+' '+p.cat).toLowerCase().includes(q));
   const note = $('#resultNote');
@@ -244,6 +245,11 @@ function initReveal(){
 /* ---- eventos globales (delegación) ---- */
 function bindEvents(){
   document.addEventListener('click', e => {
+    if(e.target.closest('.mobile-nav a')){
+      const nav = $('#mobileNav');
+      if(nav){ nav.classList.remove('open'); if($('#menuBtn')) $('#menuBtn').setAttribute('aria-expanded','false'); }
+    }
+
     const add = e.target.closest('[data-add]');
     if(add){ addToCart(+add.dataset.add); return; }
 
@@ -276,9 +282,10 @@ function bindEvents(){
   if($('#searchInput')) $('#searchInput').addEventListener('input', refresh);
 
   if($('#menuBtn')) $('#menuBtn').addEventListener('click', () => {
-    const cat = $('#categorias');
-    if(cat) cat.scrollIntoView({behavior:'smooth'});
-    else window.location.href = 'index.html#categorias';
+    const nav = $('#mobileNav');
+    if(!nav) return;
+    const isOpen = nav.classList.toggle('open');
+    $('#menuBtn').setAttribute('aria-expanded', String(isOpen));
   });
 
   if($('#newsForm')) $('#newsForm').addEventListener('submit', e => {

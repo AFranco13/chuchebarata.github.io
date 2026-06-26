@@ -1,5 +1,5 @@
 /* =========================================================
-   Chuchebarata — app.js
+   El Kiosquillo (chuchebarata.com) — app.js
    Ilustraciones SVG propias + tienda interactiva
    ========================================================= */
 

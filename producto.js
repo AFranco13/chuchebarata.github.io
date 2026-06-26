@@ -167,10 +167,74 @@ function renderRelated(p) {
 }
 
 /* ── meta SEO dinámico ────────────────────────────────────── */
+const SITE_BASE = 'https://chuchebarata.com';
+
+function setAttr(id, attr, value) {
+  const el = document.getElementById(id);
+  if (el && value) el.setAttribute(attr, value);
+}
+
 function updateMeta(p) {
-  document.title = `${p.nombre} · Chuchebarata`;
-  const descEl = document.getElementById('pageDesc');
-  if (descEl && p.desc_short) descEl.content = p.desc_short;
+  const title = `${p.nombre} · Chuches baratas | El Kiosquillo`;
+  const desc = p.desc_short || `Compra ${p.nombre} al mejor precio en El Kiosquillo. Chuches baratas online con envío en 24-48h.`;
+  const url = `${SITE_BASE}/producto.html?id=${p.id}`;
+  const image = p.img ? `${SITE_BASE}/${p.img}` : `${SITE_BASE}/images/productos/mesa-dulce-rosa.jpg`;
+
+  document.title = title;
+  setAttr('pageDesc', 'content', desc);
+  setAttr('pageCanonical', 'href', url);
+  setAttr('ogTitle', 'content', title);
+  setAttr('ogDesc', 'content', desc);
+  setAttr('ogUrl', 'content', url);
+  setAttr('ogImage', 'content', image);
+  setAttr('twTitle', 'content', title);
+  setAttr('twDesc', 'content', desc);
+  setAttr('twImage', 'content', image);
+
+  injectJsonLd(p, url, image, desc);
+}
+
+/* ── datos estructurados (Product + Breadcrumb) ───────────── */
+function injectJsonLd(p, url, image, desc) {
+  const product = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": p.nombre,
+    "description": desc,
+    "image": image,
+    "sku": p.referencia || String(p.id),
+    "brand": { "@type": "Brand", "name": p.marca || "El Kiosquillo" },
+    "category": p.cat_label || p.cat,
+    "offers": {
+      "@type": "Offer",
+      "url": url,
+      "priceCurrency": "EUR",
+      "price": p.price.toFixed(2),
+      "availability": p.en_stock
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock",
+      "seller": { "@type": "Organization", "name": "El Kiosquillo" }
+    }
+  };
+
+  const breadcrumb = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Inicio", "item": `${SITE_BASE}/` },
+      { "@type": "ListItem", "position": 2, "name": p.cat_label || p.cat, "item": `${SITE_BASE}/index.html#tienda` },
+      { "@type": "ListItem", "position": 3, "name": p.nombre, "item": url }
+    ]
+  };
+
+  let script = document.getElementById('jsonLdProduct');
+  if (!script) {
+    script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.id = 'jsonLdProduct';
+    document.head.appendChild(script);
+  }
+  script.textContent = JSON.stringify([product, breadcrumb]);
 }
 
 /* ── init ─────────────────────────────────────────────────── */

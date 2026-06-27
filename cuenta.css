@@ -1,0 +1,227 @@
+/* =========================================================
+   El Kiosquillo — cuenta.css
+   Estilos de: banner de cookies, menú de cuenta, páginas de
+   acceso/registro, perfil, seguimiento de pedidos y páginas
+   legales. Reutiliza los tokens de styles.css.
+   ========================================================= */
+
+/* ===================== BANNER DE COOKIES ===================== */
+.cc-banner{
+  position:fixed;left:0;right:0;bottom:0;z-index:200;
+  background:#fff;border-top:1px solid var(--line);
+  box-shadow:0 -18px 40px -30px rgba(42,26,36,.5);
+  transform:translateY(110%);transition:transform .35s var(--ease);
+}
+.cc-banner.show{transform:translateY(0)}
+.cc-inner{max-width:var(--maxw);margin:0 auto;padding:20px 28px;display:flex;gap:26px;align-items:center;flex-wrap:wrap}
+.cc-text{flex:1;min-width:260px}
+.cc-text strong{font-family:var(--display);font-size:1.02rem}
+.cc-text p{font-size:.88rem;color:var(--muted);margin-top:4px;max-width:64ch}
+.cc-text a{color:var(--wine);text-decoration:underline}
+.cc-actions{display:flex;gap:10px;flex-wrap:wrap}
+.cc-btn{
+  font-family:var(--display);font-weight:600;font-size:.92rem;
+  padding:11px 20px;border-radius:var(--r-sm);border:1.5px solid var(--line-strong);
+  background:#fff;color:var(--ink);cursor:pointer;transition:transform .18s var(--ease),background .18s,border-color .18s;
+}
+.cc-btn:hover{transform:translateY(-2px)}
+.cc-accept{background:var(--wine);border-color:var(--wine);color:#fff}
+.cc-accept:hover{background:var(--wine-700)}
+.cc-reject{border-color:var(--line-strong)}
+.cc-reject:hover{border-color:var(--wine);color:var(--wine)}
+.cc-custom:hover{border-color:var(--wine);color:var(--wine)}
+
+.cc-overlay{
+  position:fixed;inset:0;z-index:210;background:rgba(42,26,36,.45);
+  display:grid;place-items:center;padding:24px;opacity:0;transition:opacity .25s}
+.cc-overlay.show{opacity:1}
+.cc-panel{
+  background:#fff;border-radius:var(--r);max-width:520px;width:100%;
+  padding:30px;box-shadow:var(--shadow);max-height:90vh;overflow:auto;
+  transform:translateY(12px);transition:transform .25s var(--ease)}
+.cc-overlay.show .cc-panel{transform:none}
+.cc-panel h2{font-size:var(--s2)}
+.cc-panel-intro{font-size:.9rem;color:var(--muted);margin:8px 0 20px}
+.cc-group{border:1px solid var(--line);border-radius:var(--r-sm);padding:14px 16px;margin-bottom:12px}
+.cc-group-head{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.cc-group-head b{font-family:var(--display);font-size:.98rem}
+.cc-group-head small{display:block;color:var(--muted);font-size:.82rem;margin-top:2px}
+.cc-switch{position:relative;display:inline-block;width:44px;height:25px;flex-shrink:0}
+.cc-switch input{opacity:0;width:0;height:0}
+.cc-switch span{position:absolute;inset:0;background:var(--line-strong);border-radius:25px;transition:background .2s;cursor:pointer}
+.cc-switch span::before{content:"";position:absolute;width:19px;height:19px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .2s}
+.cc-switch input:checked + span{background:var(--pistachio)}
+.cc-switch input:checked + span::before{transform:translateX(19px)}
+.cc-switch.cc-fixed span{background:var(--wine);opacity:.55;cursor:not-allowed}
+.cc-panel-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+
+/* ===================== MENÚ DE CUENTA (header) ===================== */
+.account{position:relative;display:flex;align-items:center}
+.account-trigger{text-decoration:none}
+.account-avatar{
+  width:30px;height:30px;border-radius:50%;display:grid;place-items:center;
+  background:var(--wine);color:#fff;font-family:var(--display);font-weight:700;font-size:.78rem;letter-spacing:.02em}
+.account-avatar.lg{width:42px;height:42px;font-size:1rem}
+.account-menu{
+  position:absolute;top:calc(100% + 10px);right:0;width:230px;background:#fff;
+  border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);
+  padding:8px;opacity:0;visibility:hidden;transform:translateY(-6px);
+  transition:opacity .18s,transform .18s,visibility .18s;z-index:60}
+.account-menu.open{opacity:1;visibility:visible;transform:none}
+.account-menu-head{display:flex;align-items:center;gap:11px;padding:10px 10px 12px;border-bottom:1px solid var(--line);margin-bottom:6px}
+.account-menu-head b{font-family:var(--display);font-size:.96rem;display:block;line-height:1.1}
+.account-menu-head small{color:var(--muted);font-size:.78rem;word-break:break-all}
+.account-menu a,.account-menu button{
+  display:block;width:100%;text-align:left;padding:10px 10px;border:none;background:none;
+  font-family:var(--sans);font-size:.92rem;font-weight:600;color:var(--ink);cursor:pointer;
+  border-radius:var(--r-sm);transition:background .15s,color .15s}
+.account-menu a:hover,.account-menu button:hover{background:var(--blush);color:var(--wine)}
+#logoutBtn{color:var(--muted)}
+
+/* ===================== PÁGINAS DE CUENTA (layout común) ===================== */
+.account-page{min-height:60vh;padding:46px 0 80px}
+.account-narrow{max-width:460px;margin:0 auto}
+.auth-card{
+  background:#fff;border:1px solid var(--line);border-radius:var(--r);
+  padding:34px 32px;box-shadow:var(--shadow-sm)}
+.auth-card h1{font-size:var(--s3);margin-bottom:6px}
+.auth-card .sub{color:var(--muted);font-size:.94rem;margin-bottom:24px}
+.auth-alt{text-align:center;margin-top:20px;font-size:.92rem;color:var(--muted)}
+.auth-alt a{color:var(--wine);font-weight:600;text-decoration:underline}
+
+/* ---- formularios ---- */
+.field{margin-bottom:16px}
+.field label{display:block;font-weight:600;font-size:.88rem;margin-bottom:6px}
+.field input[type=text],.field input[type=email],.field input[type=password],
+.field input[type=tel],.field textarea{
+  width:100%;padding:13px 15px;border:1.5px solid var(--line);border-radius:var(--r-sm);
+  background:#fff;font-family:var(--sans);font-size:.98rem;outline:none;transition:border-color .18s}
+.field input:focus,.field textarea:focus{border-color:var(--wine)}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.consent{display:flex;gap:10px;align-items:flex-start;margin-bottom:12px;font-size:.86rem;color:var(--muted)}
+.consent input{margin-top:3px;width:17px;height:17px;flex-shrink:0;accent-color:var(--wine)}
+.consent a{color:var(--wine);text-decoration:underline}
+.form-msg{font-size:.88rem;padding:11px 14px;border-radius:var(--r-sm);margin-bottom:16px;display:none}
+.form-msg.show{display:block}
+.form-msg.error{background:#FCEBEF;color:#8A1538;border:1px solid #F2C9D4}
+.form-msg.ok{background:#E7F2EC;color:#2C6B4A;border:1px solid #C6E3D2}
+.muted-link{color:var(--muted);font-size:.86rem;text-decoration:underline}
+
+/* ===================== PERFIL ===================== */
+.profile-head{display:flex;align-items:center;gap:18px;margin-bottom:30px}
+.profile-head .account-avatar{width:60px;height:60px;font-size:1.4rem}
+.profile-head h1{font-size:var(--s3)}
+.profile-head p{color:var(--muted);font-size:.94rem}
+.profile-grid{display:grid;grid-template-columns:220px 1fr;gap:34px;align-items:start}
+.profile-tabs{display:flex;flex-direction:column;gap:4px;position:sticky;top:90px}
+.profile-tabs button{
+  text-align:left;padding:12px 16px;border:none;background:none;border-radius:var(--r-sm);
+  font-family:var(--sans);font-weight:600;font-size:.94rem;color:var(--muted);cursor:pointer;transition:background .15s,color .15s}
+.profile-tabs button:hover{background:var(--blush);color:var(--wine)}
+.profile-tabs button.active{background:var(--wine);color:#fff}
+.panel{display:none}
+.panel.active{display:block}
+.panel-card{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:28px;margin-bottom:20px}
+.panel-card h2{font-size:var(--s2);margin-bottom:6px}
+.panel-card .card-sub{color:var(--muted);font-size:.9rem;margin-bottom:20px}
+.danger-zone{border-color:#F2C9D4}
+.danger-zone h2{color:#8A1538}
+.btn-danger{background:#8A1538;color:#fff;border-color:#8A1538}
+.btn-danger:hover{background:#6E1029}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+
+/* ---- lista de pedidos ---- */
+.order-list{display:flex;flex-direction:column;gap:14px}
+.order-card{
+  display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;
+  background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:18px 22px;
+  transition:transform .18s var(--ease),box-shadow .18s,border-color .18s}
+.order-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-sm);border-color:transparent}
+.order-card .o-main b{font-family:var(--display);font-size:1.02rem}
+.order-card .o-main small{display:block;color:var(--muted);font-size:.84rem;margin-top:2px}
+.order-card .o-side{display:flex;align-items:center;gap:18px}
+.order-card .o-total{font-family:var(--display);font-weight:700}
+.empty-state{text-align:center;padding:50px 20px;color:var(--muted)}
+.empty-state b{display:block;font-family:var(--display);font-size:1.1rem;color:var(--ink);margin-bottom:6px}
+
+/* ---- badges de estado ---- */
+.badge{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:700;
+  padding:5px 12px;border-radius:20px;white-space:nowrap}
+.badge::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.badge.gris{background:#EFECEE;color:#6B5B63}
+.badge.azul{background:#E7EEF6;color:#2C5A8A}
+.badge.naranja{background:#FBEEDD;color:#9A5B16}
+.badge.morado{background:#F0E7F2;color:#6A3B7E}
+.badge.verde{background:#E7F2EC;color:#2C6B4A}
+.badge.rojo{background:#FCEBEF;color:#8A1538}
+
+/* ===================== DETALLE / SEGUIMIENTO DE PEDIDO ===================== */
+.order-detail{max-width:760px;margin:0 auto}
+.back-link{color:var(--muted);font-weight:600;font-size:.9rem;display:inline-flex;gap:6px;margin-bottom:18px}
+.back-link:hover{color:var(--wine)}
+.order-detail-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-bottom:24px}
+.order-detail-head h1{font-size:var(--s3)}
+.order-detail-head p{color:var(--muted);font-size:.9rem;margin-top:4px}
+
+/* línea de tiempo de seguimiento */
+.tracking{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:28px;margin-bottom:20px}
+.tracking h2{font-size:var(--s1);margin-bottom:22px}
+.timeline{list-style:none;position:relative;padding-left:6px}
+.timeline li{position:relative;padding:0 0 26px 34px}
+.timeline li::before{content:"";position:absolute;left:8px;top:20px;bottom:-6px;width:2px;background:var(--line)}
+.timeline li:last-child::before{display:none}
+.timeline .dot{position:absolute;left:0;top:0;width:18px;height:18px;border-radius:50%;
+  border:2px solid var(--line-strong);background:#fff}
+.timeline li.done .dot{background:var(--pistachio);border-color:var(--pistachio)}
+.timeline li.done::before{background:var(--pistachio)}
+.timeline li.now .dot{background:var(--wine);border-color:var(--wine);box-shadow:0 0 0 4px rgba(110,26,60,.15)}
+.timeline .t-label{font-family:var(--display);font-weight:600}
+.timeline li.pending .t-label{color:var(--muted)}
+.timeline .t-desc{font-size:.86rem;color:var(--muted);margin-top:2px}
+.timeline .t-date{font-size:.78rem;color:var(--muted);margin-top:2px}
+
+/* resumen de productos del pedido */
+.order-items{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:24px 28px;margin-bottom:20px}
+.order-items h2{font-size:var(--s1);margin-bottom:16px}
+.oi-row{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--line)}
+.oi-row:last-child{border-bottom:none}
+.oi-art{width:48px;height:48px;border-radius:10px;flex-shrink:0;display:grid;place-items:center;overflow:hidden}
+.oi-art img{width:100%;height:100%;object-fit:cover}
+.oi-info{flex:1}
+.oi-info b{font-family:var(--display);font-weight:600;font-size:.96rem}
+.oi-info small{display:block;color:var(--muted);font-size:.82rem}
+.oi-price{font-weight:700}
+.order-totals{margin-top:16px;border-top:1px solid var(--line);padding-top:16px}
+.order-totals .tr{display:flex;justify-content:space-between;font-size:.92rem;margin-bottom:6px;color:var(--muted)}
+.order-totals .tr.grand{font-family:var(--display);font-size:1.1rem;color:var(--ink);font-weight:700;margin-top:8px}
+.addr-box{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:24px 28px}
+.addr-box h2{font-size:var(--s1);margin-bottom:10px}
+.addr-box p{color:var(--muted);font-size:.92rem;line-height:1.6}
+
+/* ===================== PÁGINAS LEGALES ===================== */
+.legal{max-width:760px;margin:0 auto;padding:46px 0 80px}
+.legal h1{font-size:var(--s4);margin-bottom:8px}
+.legal .updated{color:var(--muted);font-size:.86rem;margin-bottom:30px}
+.legal h2{font-size:var(--s2);margin:34px 0 12px}
+.legal h3{font-size:1.1rem;margin:22px 0 8px}
+.legal p,.legal li{color:#4A3A42;font-size:.96rem;line-height:1.75}
+.legal ul{list-style:disc;padding-left:22px;margin:10px 0}
+.legal li{margin-bottom:6px}
+.legal a{color:var(--wine);text-decoration:underline}
+.legal table{width:100%;border-collapse:collapse;margin:16px 0;font-size:.9rem}
+.legal th,.legal td{border:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top}
+.legal th{background:var(--blush);font-family:var(--display);font-weight:600}
+.legal .note{background:var(--blush);border-radius:var(--r-sm);padding:16px 18px;font-size:.9rem;margin:18px 0}
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width:860px){
+  .profile-grid{grid-template-columns:1fr}
+  .profile-tabs{flex-direction:row;overflow-x:auto;position:static;gap:6px;padding-bottom:6px}
+  .profile-tabs button{white-space:nowrap}
+}
+@media (max-width:560px){
+  .field-row{grid-template-columns:1fr}
+  .cc-actions{width:100%}
+  .cc-actions .cc-btn{flex:1}
+  .auth-card{padding:26px 22px}
+}

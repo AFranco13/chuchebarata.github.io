@@ -134,9 +134,12 @@
     </nav>
     <nav class="footer-col" aria-label="Información">
       <h4>Información</h4>
-      <a href="#">Sobre nosotros</a>
-      <a href="#">Aviso legal</a>
-      <a href="#">Política de cookies</a>
+      <a href="index.html#valores">Sobre nosotros</a>
+      <a href="aviso-legal.html">Aviso legal</a>
+      <a href="privacidad.html">Política de privacidad</a>
+      <a href="terminos.html">Términos y condiciones</a>
+      <a href="cookies.html">Política de cookies</a>
+      <a href="#" onclick="abrirPanelCookies();return false;">Gestionar cookies</a>
     </nav>
   </div>
   <div class="container footer-bottom">
@@ -167,6 +170,10 @@
 
 <div class="toast" id="toast"><span id="toastMsg"></span></div>
 
+<script src="auth.js"></script>
+<script src="checkout.js"></script>
+<script src="sesion.js"></script>
+<script src="cookies-consent.js"></script>
 <script src="productos_data.js"></script>
 <script src="app.js" defer></script>
 <script src="producto.js" defer></script>

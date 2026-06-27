@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi cuenta · El Kiosquillo</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="cuenta.css">
+</head>
+<body>
+
+<div class="utility">
+  <div class="container utility-in">
+    <span>Envío en 24-48 h · Gratis a partir de 49&nbsp;€</span>
+    <span class="utility-right">Atención por WhatsApp · Lun&nbsp;a&nbsp;Sáb</span>
+  </div>
+</div>
+
+<header>
+  <div class="container header-in">
+    <a href="index.html" class="brand" aria-label="El Kiosquillo, inicio">
+      <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="14" cy="21" r="5" fill="currentColor" opacity=".85"/><circle cx="26" cy="21" r="5" fill="currentColor" opacity=".85"/><circle cx="20" cy="14" r="4" fill="currentColor"/></svg>
+      <span class="brand-name">El Kiosquillo</span>
+    </a>
+    <nav class="nav" aria-label="Principal">
+      <a href="index.html#categorias">Catálogo</a>
+      <a href="index.html#tienda">Chuches</a>
+      <a href="caja.html">Crea tu caja</a>
+      <a href="index.html#eventos">Fiestas y eventos</a>
+    </nav>
+    <div class="header-tools">
+      <a class="tool" href="index.html" aria-label="Volver a la tienda" title="Volver a la tienda">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14l-1.2 10.5a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8L5 7Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 7a3 3 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+      </a>
+    </div>
+  </div>
+</header>
+
+<main class="account-page">
+  <div class="container">
+    <div class="profile-head">
+      <span class="account-avatar" id="avatar">U</span>
+      <div>
+        <h1 id="hello">Mi cuenta</h1>
+        <p id="helloSub"></p>
+      </div>
+    </div>
+
+    <div class="profile-grid">
+      <nav class="profile-tabs" aria-label="Secciones de la cuenta">
+        <button class="active" data-tab="pedidos">Mis pedidos</button>
+        <button data-tab="datos">Mis datos</button>
+        <button data-tab="direccion">Dirección de envío</button>
+        <button data-tab="seguridad">Seguridad</button>
+        <button data-tab="privacidad">Privacidad y datos</button>
+      </nav>
+
+      <div class="profile-content">
+
+        <!-- PEDIDOS -->
+        <section class="panel active" id="tab-pedidos">
+          <div class="panel-card">
+            <h2>Mis pedidos</h2>
+            <p class="card-sub">Aquí tienes tu historial y el seguimiento de los envíos en curso.</p>
+            <div class="order-list" id="orderList"></div>
+          </div>
+        </section>
+
+        <!-- DATOS -->
+        <section class="panel" id="tab-datos">
+          <div class="panel-card">
+            <h2>Mis datos</h2>
+            <p class="card-sub">Tu información personal. El correo es tu identificador de acceso.</p>
+            <div class="form-msg ok" id="datosMsg"></div>
+            <form id="datosForm">
+              <div class="field">
+                <label for="d-nombre">Nombre completo</label>
+                <input type="text" id="d-nombre" autocomplete="name">
+              </div>
+              <div class="field">
+                <label for="d-email">Correo electrónico</label>
+                <input type="email" id="d-email" disabled>
+              </div>
+              <div class="field">
+                <label for="d-tel">Teléfono</label>
+                <input type="tel" id="d-tel" autocomplete="tel">
+              </div>
+              <label class="consent">
+                <input type="checkbox" id="d-marketing">
+                <span>Quiero recibir ofertas y novedades por correo.</span>
+              </label>
+              <button type="submit" class="btn btn-primary">Guardar cambios</button>
+            </form>
+          </div>
+        </section>
+
+        <!-- DIRECCIÓN -->
+        <section class="panel" id="tab-direccion">
+          <div class="panel-card">
+            <h2>Dirección de envío</h2>
+            <p class="card-sub">La usaremos por defecto al tramitar tus pedidos.</p>
+            <div class="form-msg ok" id="dirMsg"></div>
+            <form id="dirForm">
+              <div class="field">
+                <label for="a-linea1">Dirección</label>
+                <input type="text" id="a-linea1" autocomplete="address-line1" placeholder="Calle, número">
+              </div>
+              <div class="field">
+                <label for="a-linea2">Piso, puerta, etc. (opcional)</label>
+                <input type="text" id="a-linea2" autocomplete="address-line2">
+              </div>
+              <div class="field-row">
+                <div class="field">
+                  <label for="a-cp">Código postal</label>
+                  <input type="text" id="a-cp" autocomplete="postal-code">
+                </div>
+                <div class="field">
+                  <label for="a-ciudad">Ciudad</label>
+                  <input type="text" id="a-ciudad" autocomplete="address-level2">
+                </div>
+              </div>
+              <div class="field">
+                <label for="a-provincia">Provincia</label>
+                <input type="text" id="a-provincia" autocomplete="address-level1">
+              </div>
+              <button type="submit" class="btn btn-primary">Guardar dirección</button>
+            </form>
+          </div>
+        </section>
+
+        <!-- SEGURIDAD -->
+        <section class="panel" id="tab-seguridad">
+          <div class="panel-card">
+            <h2>Seguridad</h2>
+            <p class="card-sub">Cambia tu contraseña cuando quieras.</p>
+            <div class="form-msg" id="segMsg"></div>
+            <form id="segForm">
+              <div class="field">
+                <label for="s-actual">Contraseña actual</label>
+                <input type="password" id="s-actual" autocomplete="current-password">
+              </div>
+              <div class="field">
+                <label for="s-nueva">Nueva contraseña</label>
+                <input type="password" id="s-nueva" autocomplete="new-password" minlength="6">
+              </div>
+              <button type="submit" class="btn btn-primary">Cambiar contraseña</button>
+            </form>
+          </div>
+        </section>
+
+        <!-- PRIVACIDAD / RGPD -->
+        <section class="panel" id="tab-privacidad">
+          <div class="panel-card">
+            <h2>Tus derechos sobre tus datos</h2>
+            <p class="card-sub">Conforme al RGPD y la LOPDGDD puedes ejercer estos derechos en cualquier momento.</p>
+            <ul class="legal" style="padding:0;margin:0">
+              <li><b>Acceso y rectificación:</b> consulta y edita tus datos en las pestañas «Mis datos» y «Dirección».</li>
+              <li><b>Portabilidad:</b> descarga todos tus datos en un archivo.</li>
+              <li><b>Oposición al marketing:</b> desactiva las comunicaciones en «Mis datos».</li>
+            </ul>
+            <div class="btn-row" style="margin-top:18px">
+              <button class="btn btn-ghost" id="exportBtn">Descargar mis datos (JSON)</button>
+            </div>
+          </div>
+
+          <div class="panel-card danger-zone">
+            <h2>Eliminar mi cuenta</h2>
+            <p class="card-sub">Se anonimizarán tus datos personales. Por obligación legal, los pedidos se
+            conservan de forma anónima durante 5 años (normativa fiscal). Esta acción no se puede deshacer.</p>
+            <button class="btn btn-danger" id="deleteBtn">Eliminar mi cuenta</button>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container footer-bottom">
+    <span>© 2026 El Kiosquillo · chuchebarata.com</span>
+    <span><a href="aviso-legal.html">Aviso legal</a> · <a href="privacidad.html">Privacidad</a> · <a href="cookies.html">Cookies</a></span>
+  </div>
+</footer>
+
+<script src="auth.js"></script>
+<script src="sesion.js"></script>
+<script src="cookies-consent.js"></script>
+<script src="perfil.js"></script>
+</body>
+</html>

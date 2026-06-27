@@ -15,12 +15,12 @@
     /* cart: { id: cantidad }
        resolve(id, cantidad) -> { id, nombre, precio, cantidad, img, tint } | null
        Devuelve { ok, id } o { ok:false, reason:'empty'|'auth'|... } */
-    tramitar({ cart, resolve }) {
+    async tramitar({ cart, resolve }) {
       const ids = Object.keys(cart || {});
       if (!ids.length) return { ok: false, reason: 'empty' };
 
       // Hace falta sesión: si no la hay, vamos a login y volvemos aquí.
-      if (!global.Auth || !Auth.isLoggedIn()) {
+      if (!global.Auth || !(await Auth.isLoggedIn())) {
         const back = location.pathname.split('/').pop() + location.search;
         location.href = 'login.html?returnTo=' + encodeURIComponent(back);
         return { ok: false, reason: 'auth' };
@@ -33,10 +33,10 @@
       const envio = subtotal >= FREE_SHIPPING ? 0 : SHIPPING_FEE;
       const total = subtotal + envio;
 
-      const u = Auth.getCurrentUser();
-      const d = u.direccion || {};
+      const u = await Auth.getCurrentUser();
+      const d = (u && u.direccion) || {};
       const direccion = {
-        nombre: u.nombre, telefono: u.telefono || '',
+        nombre: (u && u.nombre) || '', telefono: (u && u.telefono) || '',
         linea1: d.linea1 || '', linea2: d.linea2 || '',
         cp: d.cp || '', ciudad: d.ciudad || '', provincia: d.provincia || '',
       };

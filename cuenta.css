@@ -56,6 +56,9 @@
 .cc-panel-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
 
 /* ===================== MENÚ DE CUENTA (header) ===================== */
+/* Empuja las herramientas (buscar, carrito, cuenta) al borde derecho
+   también cuando el menú de navegación está oculto en móvil. */
+.header-tools{margin-left:auto}
 .account{position:relative;display:flex;align-items:center}
 .account-trigger{text-decoration:none}
 .account-avatar{
@@ -63,14 +66,15 @@
   background:var(--wine);color:#fff;font-family:var(--display);font-weight:700;font-size:.78rem;letter-spacing:.02em}
 .account-avatar.lg{width:42px;height:42px;font-size:1rem}
 .account-menu{
-  position:absolute;top:calc(100% + 10px);right:0;width:230px;background:#fff;
+  position:absolute;top:calc(100% + 10px);right:0;width:230px;max-width:calc(100vw - 24px);background:#fff;
   border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);
   padding:8px;opacity:0;visibility:hidden;transform:translateY(-6px);
   transition:opacity .18s,transform .18s,visibility .18s;z-index:60}
 .account-menu.open{opacity:1;visibility:visible;transform:none}
 .account-menu-head{display:flex;align-items:center;gap:11px;padding:10px 10px 12px;border-bottom:1px solid var(--line);margin-bottom:6px}
-.account-menu-head b{font-family:var(--display);font-size:.96rem;display:block;line-height:1.1}
-.account-menu-head small{color:var(--muted);font-size:.78rem;word-break:break-all}
+.account-menu-head > div{min-width:0;flex:1}
+.account-menu-head b{font-family:var(--display);font-size:.96rem;display:block;line-height:1.1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.account-menu-head small{display:block;color:var(--muted);font-size:.78rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .account-menu a,.account-menu button{
   display:block;width:100%;text-align:left;padding:10px 10px;border:none;background:none;
   font-family:var(--sans);font-size:.92rem;font-weight:600;color:var(--ink);cursor:pointer;
@@ -224,4 +228,11 @@
   .cc-actions{width:100%}
   .cc-actions .cc-btn{flex:1}
   .auth-card{padding:26px 22px}
+}
+/* En pantallas pequeñas, compacta las herramientas de la cabecera para
+   que quepan marca + buscar + carrito + cuenta + menú sin amontonarse. */
+@media (max-width:460px){
+  .header-tools{gap:2px}
+  .header-tools .tool{width:38px;height:38px}
+  .account-avatar{width:28px;height:28px;font-size:.74rem}
 }

@@ -38,6 +38,7 @@
           </div>
           <a href="perfil.html" role="menuitem">Mi perfil</a>
           <a href="perfil.html#pedidos" role="menuitem">Mis pedidos</a>
+          ${user.isAdmin ? '<a href="admin.html" role="menuitem">Panel de administración</a>' : ''}
           <button type="button" id="logoutBtn" role="menuitem">Cerrar sesión</button>
         </div>`;
     }

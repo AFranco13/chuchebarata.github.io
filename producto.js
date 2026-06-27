@@ -111,13 +111,13 @@ function renderDetail(p) {
 
       <div class="pd-actions">
         <div class="pd-qty">
-          <button id="pdMinus" aria-label="Quitar uno">−</button>
+          <button id="pdMinus" aria-label="Quitar uno"${p.en_stock ? '' : ' disabled'}>−</button>
           <span id="pdQtyDisplay">1</span>
-          <button id="pdPlus" aria-label="Añadir uno">+</button>
+          <button id="pdPlus" aria-label="Añadir uno"${p.en_stock ? '' : ' disabled'}>+</button>
         </div>
-        <button class="btn btn-primary pd-add" id="pdAddBtn">
-          ${cartIcon} Añadir al carrito
-        </button>
+        ${p.en_stock
+          ? `<button class="btn btn-primary pd-add" id="pdAddBtn">${cartIcon} Añadir al carrito</button>`
+          : `<button class="btn btn-primary pd-add" id="pdAddBtn" disabled>Agotado</button>`}
       </div>
 
       ${featuresHTML}
@@ -125,16 +125,18 @@ function renderDetail(p) {
       ${metaHTML}
     </div>`;
 
-  // Eventos de cantidad
-  $('#pdMinus').addEventListener('click', () => {
-    if (pdQty > 1) { pdQty--; $('#pdQtyDisplay').textContent = pdQty; }
-  });
-  $('#pdPlus').addEventListener('click', () => {
-    pdQty++; $('#pdQtyDisplay').textContent = pdQty;
-  });
-  $('#pdAddBtn').addEventListener('click', () => {
-    for (let i = 0; i < pdQty; i++) addToCart(p.id);
-  });
+  // Eventos de cantidad (solo si hay stock)
+  if (p.en_stock) {
+    $('#pdMinus').addEventListener('click', () => {
+      if (pdQty > 1) { pdQty--; $('#pdQtyDisplay').textContent = pdQty; }
+    });
+    $('#pdPlus').addEventListener('click', () => {
+      pdQty++; $('#pdQtyDisplay').textContent = pdQty;
+    });
+    $('#pdAddBtn').addEventListener('click', () => {
+      for (let i = 0; i < pdQty; i++) addToCart(p.id);
+    });
+  }
 }
 
 /* ── productos relacionados ───────────────────────────────── */

@@ -61,10 +61,9 @@
         <tr><th>Nombre</th><th>Tipo</th><th>Finalidad</th><th>Duración</th></tr>
       </thead>
       <tbody>
-        <tr><td><code>kq_session</code></td><td>Necesaria</td><td>Mantener tu sesión iniciada para acceder a tu cuenta.</td><td>Hasta cerrar sesión</td></tr>
+        <tr><td><code>sb-…-auth-token</code></td><td>Necesaria</td><td>Mantener tu sesión iniciada de forma segura (servicio de autenticación Supabase).</td><td>Hasta cerrar sesión</td></tr>
         <tr><td><code>kq_cookie_consent</code></td><td>Necesaria</td><td>Recordar tus preferencias de cookies.</td><td>12 meses</td></tr>
-        <tr><td><code>kq_users</code> / <code>kq_orders</code></td><td>Necesaria</td><td>Almacenar tu cuenta y tus pedidos para que el servicio funcione.</td><td>Permanente hasta que elimines la cuenta</td></tr>
-        <tr><td>Carrito persistente</td><td>Preferencias</td><td>Recordar el contenido de tu carrito entre visitas.</td><td>30 días</td></tr>
+        <tr><td><code>kq_cart</code></td><td>Necesaria</td><td>Recordar el contenido de tu carrito durante la sesión de compra.</td><td>Hasta cerrar la pestaña</td></tr>
         <tr><td>Analítica (p. ej. Google Analytics)</td><td>Analítica</td><td>Medir el uso de la web de forma agregada.</td><td>Hasta 13 meses</td></tr>
         <tr><td>Marketing (p. ej. píxeles publicitarios)</td><td>Marketing</td><td>Mostrar ofertas relevantes dentro y fuera de la web.</td><td>Hasta 13 meses</td></tr>
       </tbody>

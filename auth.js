@@ -74,6 +74,7 @@
         telefono: (profile && profile.telefono) || '',
         direccion: (profile && profile.direccion) || {},
         marketing: !!(profile && profile.marketing),
+        isAdmin: !!(profile && profile.is_admin),
       };
     },
 
@@ -197,12 +198,39 @@
 
     async getOrders() {
       if (!sb) return [];
+      const { data: { session } } = await sb.auth.getSession();
+      const user = session && session.user;
+      if (!user) return [];
+      // Filtramos explícitamente por el usuario: un admin también tiene
+      // pedidos propios y aquí solo deben verse los suyos.
+      const { data, error } = await sb
+        .from('orders')
+        .select('*, order_items(*)')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      if (error || !data) return [];
+      return data.map(normalizeOrder);
+    },
+
+    /* ---------- administración ---------- */
+    /* Todos los pedidos (solo administradores; la RLS lo garantiza). */
+    async getAllOrders() {
+      if (!sb) return [];
       const { data, error } = await sb
         .from('orders')
         .select('*, order_items(*)')
         .order('created_at', { ascending: false });
       if (error || !data) return [];
       return data.map(normalizeOrder);
+    },
+
+    /* Cambia el estado de un pedido y registra el evento de seguimiento. */
+    async updateOrderStatus(orderId, estado, descripcion) {
+      if (!sb) return { ok: false, error: 'Servicio no disponible.' };
+      const { error } = await sb.rpc('actualizar_estado_pedido', {
+        p_order_id: orderId, p_estado: estado, p_descripcion: descripcion || null,
+      });
+      return error ? { ok: false, error: error.message } : { ok: true };
     },
 
     async getOrder(id) {

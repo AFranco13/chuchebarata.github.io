@@ -86,8 +86,22 @@ const $  = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
 const eur = n => n.toFixed(2).replace('.', ',') + ' €';
 
-let cart = {};
+/* El carrito se guarda en sessionStorage para que sobreviva a la
+   navegación (p. ej. ir a acceder y volver) sin perderse. */
+let cart = (() => { try { return JSON.parse(sessionStorage.getItem('kq_cart')) || {}; } catch { return {}; } })();
 let activeCat = 'todo';
+
+/* Datos normalizados de un producto del carrito, buscando primero en el
+   catálogo de portada (PRODUCTS) y, si no, en el completo (PRODUCTOS_DATA). */
+function cartItemData(id){
+  const p = PRODUCTS.find(x => x.id == id);
+  if(p) return { name:p.name, price:p.price, cat:p.cat, img:p.img, art:p.art };
+  if(typeof PRODUCTOS_DATA !== 'undefined'){
+    const d = PRODUCTOS_DATA.find(x => x.id == id);
+    if(d) return { name:d.nombre||d.name, price:d.price, cat:d.cat, img:d.img, art:d.art };
+  }
+  return null;
+}
 
 /* ---- categorías ---- */
 function renderCategories(){
@@ -198,14 +212,17 @@ function updateCart(){
 
   let total = 0;
   const html = ids.map(id => {
-    const p = PRODUCTS.find(x => x.id == id);
+    const p = cartItemData(id);
+    if(!p) return '';
     const q = cart[id]; total += p.price * q;
     return `<div class="ci">
-      <span class="ci-art" style="background:${TINTS[p.cat]}">${p.img ? `<img src="${p.img}" alt="${p.name}">` : ART[p.art]}</span>
+      <span class="ci-art" style="background:${TINTS[p.cat]||'var(--blush)'}">${p.img ? `<img src="${p.img}" alt="${p.name}">` : (ART[p.art]||'')}</span>
       <div class="ci-info"><b>${p.name}</b><span>${eur(p.price*q)}</span></div>
       <div class="qty"><button data-q="-1" data-id="${id}" aria-label="Quitar uno">−</button><span>${q}</span><button data-q="1" data-id="${id}" aria-label="Añadir uno">+</button></div>
     </div>`;
   }).join('');
+
+  try { sessionStorage.setItem('kq_cart', JSON.stringify(cart)); } catch {}
 
   $('#cartItems').innerHTML = ids.length ? html
     : `<div class="cart-empty"><b>Tu carrito está vacío</b>Añade algo dulce para empezar.</div>`;
@@ -270,8 +287,17 @@ function bindEvents(){
   $('#cartClose').addEventListener('click', closeCart);
   $('#scrim').addEventListener('click', closeCart);
   $('#checkoutBtn').addEventListener('click', () => {
-    if(!Object.keys(cart).length){ showToast('Tu carrito está vacío'); return; }
-    cart = {}; updateCart(); closeCart(); showToast('Pedido de prueba realizado · ¡gracias!');
+    const res = Checkout.tramitar({
+      cart,
+      resolve: (id, q) => {
+        const p = cartItemData(id);
+        if(!p) return null;
+        return { id:+id, nombre:p.name, precio:p.price, cantidad:q, img:p.img||'', tint:TINTS[p.cat]||'' };
+      },
+    });
+    if(res.reason === 'empty'){ showToast('Tu carrito está vacío'); return; }
+    if(res.reason === 'auth') return;          // redirigiendo a login
+    if(res.ok){ cart = {}; sessionStorage.removeItem('kq_cart'); updateCart(); closeCart(); location.href = 'pedido.html?id=' + res.id; }
   });
 
   $('#searchBtn').addEventListener('click', () => {

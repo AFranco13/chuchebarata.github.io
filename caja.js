@@ -28,7 +28,8 @@ const ART = {
 const cartIcon = `<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M5 7h14l-1.2 10.5a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8L5 7Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 7a3 3 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="2"/></svg>`;
 
 /* ── carrito ─────────────────────────────────────────────── */
-let cart = {};
+/* Persistido en sessionStorage para no perderlo al navegar. */
+let cart = (() => { try { return JSON.parse(sessionStorage.getItem('kq_cart')) || {}; } catch { return {}; } })();
 let toastTimer;
 
 function showToast(msg) {
@@ -71,6 +72,8 @@ function updateCart() {
       </div>
     </div>`;
   }).join('');
+
+  try { sessionStorage.setItem('kq_cart', JSON.stringify(cart)); } catch {}
 
   const cartItems = $('#cartItems');
   if (cartItems) cartItems.innerHTML = ids.length ? html
@@ -208,8 +211,17 @@ document.addEventListener('DOMContentLoaded', () => {
   $('#cartClose').addEventListener('click', closeCart);
   $('#scrim').addEventListener('click', closeCart);
   $('#checkoutBtn').addEventListener('click', () => {
-    if (!Object.keys(cart).length) { showToast('Tu carrito está vacío'); return; }
-    cart = {}; updateCart(); closeCart(); showToast('Pedido de prueba realizado · ¡gracias!');
+    const res = Checkout.tramitar({
+      cart,
+      resolve: (id, q) => {
+        const p = PRODUCTOS_DATA.find(x => x.id == id);
+        if (!p) return null;
+        return { id: +id, nombre: p.nombre || p.name, precio: p.price, cantidad: q, img: p.img || '', tint: '' };
+      },
+    });
+    if (res.reason === 'empty') { showToast('Tu carrito está vacío'); return; }
+    if (res.reason === 'auth') return;          // redirigiendo a login
+    if (res.ok) { cart = {}; sessionStorage.removeItem('kq_cart'); updateCart(); closeCart(); location.href = 'pedido.html?id=' + res.id; }
   });
   document.addEventListener('click', e => {
     const q = e.target.closest('[data-q]');

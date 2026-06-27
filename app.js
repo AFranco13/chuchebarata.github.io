@@ -286,8 +286,8 @@ function bindEvents(){
   $('#cartBtn').addEventListener('click', openCart);
   $('#cartClose').addEventListener('click', closeCart);
   $('#scrim').addEventListener('click', closeCart);
-  $('#checkoutBtn').addEventListener('click', () => {
-    const res = Checkout.tramitar({
+  $('#checkoutBtn').addEventListener('click', async () => {
+    const res = await Checkout.tramitar({
       cart,
       resolve: (id, q) => {
         const p = cartItemData(id);

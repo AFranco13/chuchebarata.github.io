@@ -75,25 +75,30 @@
   </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
 <script src="auth.js"></script>
 <script src="sesion.js"></script>
 <script src="cookies-consent.js"></script>
 <script>
-(function () {
+(async function () {
   // Si ya hay sesión, no tiene sentido mostrar el login.
-  if (Auth.isLoggedIn()) { location.replace('perfil.html'); return; }
+  if (await Auth.isLoggedIn()) { location.replace('perfil.html'); return; }
 
   const params = new URLSearchParams(location.search);
   const returnTo = params.get('returnTo');
   const form = document.getElementById('loginForm');
   const msg = document.getElementById('msg');
 
-  form.addEventListener('submit', e => {
+  form.addEventListener('submit', async e => {
     e.preventDefault();
-    const res = Auth.login({
+    const btn = form.querySelector('button[type=submit]');
+    btn.disabled = true;
+    const res = await Auth.login({
       email: document.getElementById('email').value,
       password: document.getElementById('password').value,
     });
+    btn.disabled = false;
     if (!res.ok) { msg.textContent = res.error; msg.classList.add('show'); return; }
     location.href = returnTo ? decodeURIComponent(returnTo) : 'perfil.html';
   });

@@ -69,15 +69,20 @@
   </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
 <script src="auth.js"></script>
 <script src="sesion.js"></script>
 <script src="cookies-consent.js"></script>
 <script>
-document.getElementById('recForm').addEventListener('submit', e => {
+document.getElementById('recForm').addEventListener('submit', async e => {
   e.preventDefault();
-  // El envío real de correos requiere el backend de producción. Por ahora
-  // confirmamos visualmente sin revelar si el correo existe (buena práctica).
   const msg = document.getElementById('msg');
+  const btn = e.target.querySelector('button[type=submit]');
+  btn.disabled = true;
+  await Auth.resetPassword(document.getElementById('email').value);
+  btn.disabled = false;
+  // No revelamos si el correo existe (buena práctica de seguridad).
   msg.textContent = 'Si ese correo tiene una cuenta, te hemos enviado instrucciones para restablecer la contraseña.';
   msg.classList.add('show');
   e.target.reset();

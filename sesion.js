@@ -9,7 +9,7 @@
 
   const userIcon = `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`;
 
-  function render() {
+  async function render() {
     const tools = document.querySelector('.header-tools');
     if (!tools || !window.Auth) return;
 
@@ -17,7 +17,7 @@
     const old = tools.querySelector('.account');
     if (old) old.remove();
 
-    const user = Auth.getCurrentUser();
+    const user = await Auth.getCurrentUser();
     const wrap = document.createElement('div');
     wrap.className = 'account';
 
@@ -59,8 +59,8 @@
         if (!wrap.contains(e.target)) { menu.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); }
       });
       const logout = wrap.querySelector('#logoutBtn');
-      logout.addEventListener('click', () => {
-        Auth.logout();
+      logout.addEventListener('click', async () => {
+        await Auth.logout();
         location.href = 'index.html';
       });
     }

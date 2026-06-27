@@ -92,35 +92,52 @@
   </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
 <script src="auth.js"></script>
 <script src="sesion.js"></script>
 <script src="cookies-consent.js"></script>
 <script>
-(function () {
-  if (Auth.isLoggedIn()) { location.replace('perfil.html'); return; }
+(async function () {
+  if (await Auth.isLoggedIn()) { location.replace('perfil.html'); return; }
 
   const params = new URLSearchParams(location.search);
   const returnTo = params.get('returnTo');
   const form = document.getElementById('registerForm');
   const msg = document.getElementById('msg');
 
-  form.addEventListener('submit', e => {
+  function showMsg(text, ok) {
+    msg.textContent = text;
+    msg.classList.remove('ok', 'error');
+    msg.classList.add(ok ? 'ok' : 'error', 'show');
+  }
+
+  form.addEventListener('submit', async e => {
     e.preventDefault();
     msg.classList.remove('show');
 
     if (!document.getElementById('cLegal').checked || !document.getElementById('cEdad').checked) {
-      msg.textContent = 'Debes aceptar la política de privacidad y confirmar tu edad.';
-      msg.classList.add('show');
+      showMsg('Debes aceptar la política de privacidad y confirmar tu edad.', false);
       return;
     }
 
-    const res = Auth.register({
+    const btn = form.querySelector('button[type=submit]');
+    btn.disabled = true;
+    const res = await Auth.register({
       nombre: document.getElementById('nombre').value,
       email: document.getElementById('email').value,
       password: document.getElementById('password').value,
       marketing: document.getElementById('cMarketing').checked,
     });
-    if (!res.ok) { msg.textContent = res.error; msg.classList.add('show'); return; }
+    btn.disabled = false;
+
+    if (!res.ok) { showMsg(res.error, false); return; }
+
+    if (res.needsConfirm) {
+      form.reset();
+      showMsg('¡Cuenta creada! Te hemos enviado un correo para confirmar tu dirección. Revísalo para poder acceder.', true);
+      return;
+    }
     location.href = returnTo ? decodeURIComponent(returnTo) : 'perfil.html';
   });
 })();

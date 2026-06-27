@@ -4,11 +4,8 @@
    Requiere auth.js.
    ========================================================= */
 
-(function () {
+(async function () {
   'use strict';
-
-  const user = Auth.requireAuth();
-  if (!user) return;
 
   const cont = document.getElementById('detail');
   const eur = n => (Number(n) || 0).toFixed(2).replace('.', ',') + ' €';
@@ -16,8 +13,12 @@
   const fechaCorta = iso => new Date(iso).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' });
   const fechaHora = iso => new Date(iso).toLocaleString('es-ES', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
 
+  const user = await Auth.requireAuth();
+  if (!user) return;
+
   const id = new URLSearchParams(location.search).get('id');
-  const order = id ? Auth.getOrder(id) : null;
+  cont.innerHTML = '<p style="color:var(--muted)">Cargando el pedido…</p>';
+  const order = id ? await Auth.getOrder(id) : null;
 
   if (!order) {
     cont.innerHTML = `<div class="empty-state">

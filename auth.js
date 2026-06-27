@@ -1,39 +1,23 @@
 /* =========================================================
-   El Kiosquillo — auth.js
+   El Kiosquillo — auth.js (backend real: Supabase)
    Capa de datos de cuenta, pedidos y seguimiento.
 
-   ⚠️  IMPORTANTE — VERSIÓN DE PROTOTIPO
-   Esta capa guarda los datos en el navegador (localStorage) para que
-   el flujo completo (registro, acceso, perfil, pedidos, seguimiento)
-   funcione sin servidor en GitHub Pages.
-
-   NO es segura para datos reales de clientes: las contraseñas viven en
-   el propio navegador y los datos no se comparten entre dispositivos.
-   Para producción se debe sustituir el objeto `Backend` de abajo por
-   llamadas a un backend real (p. ej. Supabase) sin tocar el resto de
-   las páginas: la API pública (`Auth`) se mantiene igual.
+   Todos los métodos que tocan el servidor son ASÍNCRONOS (devuelven
+   Promesas), por lo que en las páginas se usan con await.
+   Requiere cargar antes: la librería @supabase/supabase-js y
+   supabase-config.js (window.SUPABASE_CONFIG).
    ========================================================= */
 
 (function (global) {
   'use strict';
 
-  /* ---- claves de almacenamiento ---- */
-  const K_USERS   = 'kq_users';
-  const K_SESSION = 'kq_session';
-  const K_ORDERS  = 'kq_orders';
-  const K_COUNTER = 'kq_order_counter';
-
-  /* ---- utilidades ---- */
-  const read  = (k, def) => { try { return JSON.parse(localStorage.getItem(k)) ?? def; } catch { return def; } };
-  const write = (k, v)   => localStorage.setItem(k, JSON.stringify(v));
-  const uid   = ()       => 'u_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-
-  /* Hash no criptográfico: sólo evita guardar la contraseña en claro en
-     este prototipo. En producción el hash lo hace el backend. */
-  function weakHash(str) {
-    let h = 5381;
-    for (let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) >>> 0;
-    return 'h' + h.toString(36);
+  /* ---- inicialización del cliente ---- */
+  let sb = null;
+  const cfg = global.SUPABASE_CONFIG;
+  if (global.supabase && cfg && cfg.url && cfg.anonKey) {
+    sb = global.supabase.createClient(cfg.url, cfg.anonKey);
+  } else {
+    console.error('[auth] Supabase no está configurado. Revisa supabase-config.js y la librería @supabase/supabase-js.');
   }
 
   const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -49,23 +33,24 @@
     cancelado:  { label: 'Cancelado',         tono: 'rojo' },
   };
 
-  /* =========================================================
-     Backend de prototipo (localStorage).
-     Sustituir esta sección por el backend real en producción.
-     ========================================================= */
-  const Backend = {
-    users()        { return read(K_USERS, []); },
-    saveUsers(u)   { write(K_USERS, u); },
-    orders()       { return read(K_ORDERS, []); },
-    saveOrders(o)  { write(K_ORDERS, o); },
-
-    nextOrderNumber() {
-      const n = (read(K_COUNTER, 0) | 0) + 1;
-      write(K_COUNTER, n);
-      const year = new Date().getFullYear();
-      return `KQ-${year}-${String(n).padStart(5, '0')}`;
-    },
-  };
+  /* Normaliza un pedido de la base de datos al formato que usan las páginas. */
+  function normalizeOrder(o) {
+    return {
+      id: o.id,
+      numero: o.numero,
+      estado: o.estado,
+      subtotal: Number(o.subtotal) || 0,
+      envio: Number(o.envio) || 0,
+      total: Number(o.total) || 0,
+      direccion: o.direccion || {},
+      createdAt: o.created_at,
+      items: (o.order_items || []).map(i => ({
+        id: i.product_id, nombre: i.nombre, precio: Number(i.precio) || 0,
+        cantidad: i.cantidad, img: i.img, tint: i.tint,
+      })),
+      tracking: [],
+    };
+  }
 
   /* =========================================================
      API pública: Auth
@@ -73,182 +58,169 @@
   const Auth = {
     estados: ESTADOS,
     orderFlow: ORDER_FLOW,
+    get client() { return sb; },
 
     /* ---------- sesión ---------- */
-    getCurrentUser() {
-      const s = read(K_SESSION, null);
-      if (!s) return null;
-      const u = Backend.users().find(x => x.id === s.userId);
-      if (!u) return null;
-      const { passwordHash, ...safe } = u;   // nunca exponer el hash
-      return safe;
+    async getCurrentUser() {
+      if (!sb) return null;
+      const { data: { session } } = await sb.auth.getSession();
+      const user = session && session.user;
+      if (!user) return null;
+      const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).maybeSingle();
+      return {
+        id: user.id,
+        email: user.email,
+        nombre: (profile && profile.nombre) || '',
+        telefono: (profile && profile.telefono) || '',
+        direccion: (profile && profile.direccion) || {},
+        marketing: !!(profile && profile.marketing),
+      };
     },
 
-    isLoggedIn() { return !!this.getCurrentUser(); },
+    async isLoggedIn() {
+      if (!sb) return false;
+      const { data: { session } } = await sb.auth.getSession();
+      return !!session;
+    },
 
     /* Redirige a login si no hay sesión. Devuelve el usuario si la hay. */
-    requireAuth(redirectTo) {
-      const u = this.getCurrentUser();
+    async requireAuth(redirectTo) {
+      const u = await this.getCurrentUser();
       if (!u) {
-        const back = encodeURIComponent(location.pathname.split('/').pop() + location.search);
-        location.href = `login.html?returnTo=${redirectTo ? encodeURIComponent(redirectTo) : back}`;
+        const back = redirectTo
+          ? encodeURIComponent(redirectTo)
+          : encodeURIComponent(location.pathname.split('/').pop() + location.search);
+        location.href = `login.html?returnTo=${back}`;
         return null;
       }
       return u;
     },
 
     /* ---------- alta ---------- */
-    register({ nombre, email, password, marketing }) {
+    async register({ nombre, email, password, marketing }) {
+      if (!sb) return { ok: false, error: 'Servicio no disponible.' };
       nombre = (nombre || '').trim();
-      email  = (email  || '').trim().toLowerCase();
-
-      if (nombre.length < 2)        return { ok: false, error: 'Indica tu nombre.' };
-      if (!EMAIL_RE.test(email))    return { ok: false, error: 'El correo no es válido.' };
+      email = (email || '').trim().toLowerCase();
+      if (nombre.length < 2)     return { ok: false, error: 'Indica tu nombre.' };
+      if (!EMAIL_RE.test(email))  return { ok: false, error: 'El correo no es válido.' };
       if (!password || password.length < 6) return { ok: false, error: 'La contraseña debe tener al menos 6 caracteres.' };
 
-      const users = Backend.users();
-      if (users.some(u => u.email === email))
-        return { ok: false, error: 'Ya existe una cuenta con ese correo.' };
-
-      const user = {
-        id: uid(),
-        nombre,
-        email,
-        passwordHash: weakHash(password),
-        telefono: '',
-        direccion: { linea1: '', linea2: '', ciudad: '', cp: '', provincia: '' },
-        marketing: !!marketing,
-        createdAt: new Date().toISOString(),
-      };
-      users.push(user);
-      Backend.saveUsers(users);
-      write(K_SESSION, { userId: user.id, since: Date.now() });
-      const { passwordHash, ...safe } = user;
-      return { ok: true, user: safe };
+      const { data, error } = await sb.auth.signUp({
+        email, password,
+        options: { data: { nombre, marketing: !!marketing } },
+      });
+      if (error) return { ok: false, error: traducir(error) };
+      // Si el proyecto exige confirmar el correo, no habrá sesión todavía.
+      return { ok: true, needsConfirm: !data.session };
     },
 
     /* ---------- acceso ---------- */
-    login({ email, password }) {
-      email = (email || '').trim().toLowerCase();
-      const user = Backend.users().find(u => u.email === email);
-      if (!user || user.passwordHash !== weakHash(password || ''))
-        return { ok: false, error: 'Correo o contraseña incorrectos.' };
-      write(K_SESSION, { userId: user.id, since: Date.now() });
-      const { passwordHash, ...safe } = user;
-      return { ok: true, user: safe };
-    },
-
-    logout() { localStorage.removeItem(K_SESSION); },
-
-    /* ---------- perfil ---------- */
-    updateProfile(data) {
-      const s = read(K_SESSION, null);
-      if (!s) return { ok: false, error: 'Sesión no iniciada.' };
-      const users = Backend.users();
-      const i = users.findIndex(u => u.id === s.userId);
-      if (i < 0) return { ok: false, error: 'Usuario no encontrado.' };
-
-      const allowed = ['nombre', 'telefono', 'direccion', 'marketing'];
-      allowed.forEach(k => { if (k in data) users[i][k] = data[k]; });
-      Backend.saveUsers(users);
-      const { passwordHash, ...safe } = users[i];
-      return { ok: true, user: safe };
-    },
-
-    changePassword(actual, nueva) {
-      const s = read(K_SESSION, null);
-      if (!s) return { ok: false, error: 'Sesión no iniciada.' };
-      const users = Backend.users();
-      const i = users.findIndex(u => u.id === s.userId);
-      if (i < 0) return { ok: false, error: 'Usuario no encontrado.' };
-      if (users[i].passwordHash !== weakHash(actual || ''))
-        return { ok: false, error: 'La contraseña actual no es correcta.' };
-      if (!nueva || nueva.length < 6)
-        return { ok: false, error: 'La nueva contraseña debe tener al menos 6 caracteres.' };
-      users[i].passwordHash = weakHash(nueva);
-      Backend.saveUsers(users);
+    async login({ email, password }) {
+      if (!sb) return { ok: false, error: 'Servicio no disponible.' };
+      const { error } = await sb.auth.signInWithPassword({
+        email: (email || '').trim().toLowerCase(),
+        password: password || '',
+      });
+      if (error) return { ok: false, error: traducir(error) };
       return { ok: true };
     },
 
-    /* ---------- derechos RGPD ---------- */
+    async logout() { if (sb) await sb.auth.signOut(); },
 
-    /* Portabilidad: exporta todos los datos del usuario en JSON. */
-    exportData() {
-      const u = this.getCurrentUser();
-      if (!u) return null;
-      return {
-        exportadoEl: new Date().toISOString(),
-        perfil: u,
-        pedidos: this.getOrders(),
-      };
+    /* Envía el correo de restablecimiento de contraseña. */
+    async resetPassword(email) {
+      if (!sb) return { ok: false, error: 'Servicio no disponible.' };
+      const redirectTo = location.origin + location.pathname.replace(/[^/]*$/, 'nueva-contrasena.html');
+      const { error } = await sb.auth.resetPasswordForEmail((email || '').trim().toLowerCase(), { redirectTo });
+      // No revelamos si el correo existe (buena práctica): devolvemos ok igualmente.
+      return { ok: !error, error: error ? traducir(error) : null };
     },
 
-    /* Supresión: anonimiza el perfil, conserva los pedidos de forma anónima
-       (obligación fiscal de 5 años) y cierra la sesión. */
-    deleteAccount() {
-      const s = read(K_SESSION, null);
-      if (!s) return { ok: false, error: 'Sesión no iniciada.' };
-      const users = Backend.users();
-      const i = users.findIndex(u => u.id === s.userId);
-      if (i < 0) return { ok: false, error: 'Usuario no encontrado.' };
+    /* Fija una nueva contraseña (tras seguir el enlace del correo). */
+    async setNewPassword(nueva) {
+      if (!sb) return { ok: false, error: 'Servicio no disponible.' };
+      if (!nueva || nueva.length < 6) return { ok: false, error: 'La contraseña debe tener al menos 6 caracteres.' };
+      const { error } = await sb.auth.updateUser({ password: nueva });
+      return error ? { ok: false, error: traducir(error) } : { ok: true };
+    },
 
-      // Anonimizar pedidos (no se borran por obligación legal).
-      const orders = Backend.orders().map(o =>
-        o.userId === s.userId ? { ...o, userId: 'anon', anonimizado: true } : o);
-      Backend.saveOrders(orders);
+    /* ---------- perfil ---------- */
+    async updateProfile(data) {
+      if (!sb) return { ok: false, error: 'Servicio no disponible.' };
+      const { data: { user } } = await sb.auth.getUser();
+      if (!user) return { ok: false, error: 'Sesión no iniciada.' };
+      const patch = {};
+      ['nombre', 'telefono', 'direccion', 'marketing'].forEach(k => { if (k in data) patch[k] = data[k]; });
+      const { error } = await sb.from('profiles').update(patch).eq('id', user.id);
+      return error ? { ok: false, error: error.message } : { ok: true };
+    },
 
-      users.splice(i, 1);
-      Backend.saveUsers(users);
-      this.logout();
+    async changePassword(actual, nueva) {
+      if (!sb) return { ok: false, error: 'Servicio no disponible.' };
+      if (!nueva || nueva.length < 6) return { ok: false, error: 'La nueva contraseña debe tener al menos 6 caracteres.' };
+      const { data: { user } } = await sb.auth.getUser();
+      if (!user) return { ok: false, error: 'Sesión no iniciada.' };
+      // Verifica la contraseña actual reautenticando.
+      const { error: e1 } = await sb.auth.signInWithPassword({ email: user.email, password: actual || '' });
+      if (e1) return { ok: false, error: 'La contraseña actual no es correcta.' };
+      const { error: e2 } = await sb.auth.updateUser({ password: nueva });
+      return e2 ? { ok: false, error: traducir(e2) } : { ok: true };
+    },
+
+    /* ---------- derechos RGPD ---------- */
+    async exportData() {
+      const perfil = await this.getCurrentUser();
+      if (!perfil) return null;
+      return { exportadoEl: new Date().toISOString(), perfil, pedidos: await this.getOrders() };
+    },
+
+    async deleteAccount() {
+      if (!sb) return { ok: false, error: 'Servicio no disponible.' };
+      const { error } = await sb.rpc('eliminar_mi_cuenta');
+      if (error) return { ok: false, error: error.message };
+      await sb.auth.signOut();
       return { ok: true };
     },
 
     /* ---------- pedidos ---------- */
-
-    /* Crea un pedido a partir del carrito y devuelve su id. */
-    createOrder({ items, direccion, subtotal, envio, total }) {
-      const s = read(K_SESSION, null);
-      if (!s) return { ok: false, error: 'Debes iniciar sesión para tramitar el pedido.' };
+    async createOrder({ items, direccion, subtotal, envio, total }) {
+      if (!sb) return { ok: false, error: 'Servicio no disponible.' };
       if (!items || !items.length) return { ok: false, error: 'El carrito está vacío.' };
-
-      const now = new Date().toISOString();
-      const order = {
-        id: 'o_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-        numero: Backend.nextOrderNumber(),
-        userId: s.userId,
-        estado: 'confirmado',
-        items,
-        subtotal, envio, total,
-        direccion,
-        createdAt: now,
-        updatedAt: now,
-        tracking: [
-          { estado: 'confirmado', descripcion: 'Hemos recibido tu pedido y confirmado el pago.', fecha: now, actor: 'sistema' },
-        ],
-      };
-      const orders = Backend.orders();
-      orders.push(order);
-      Backend.saveOrders(orders);
-      return { ok: true, id: order.id, numero: order.numero };
+      const { data, error } = await sb.rpc('crear_pedido', {
+        p_items: items, p_direccion: direccion,
+        p_subtotal: subtotal, p_envio: envio, p_total: total,
+      });
+      if (error) return { ok: false, error: error.message };
+      const row = Array.isArray(data) ? data[0] : data;
+      return { ok: true, id: row.id, numero: row.numero };
     },
 
-    /* Pedidos del usuario actual, más recientes primero. */
-    getOrders() {
-      const s = read(K_SESSION, null);
-      if (!s) return [];
-      return Backend.orders()
-        .filter(o => o.userId === s.userId)
-        .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    async getOrders() {
+      if (!sb) return [];
+      const { data, error } = await sb
+        .from('orders')
+        .select('*, order_items(*)')
+        .order('created_at', { ascending: false });
+      if (error || !data) return [];
+      return data.map(normalizeOrder);
     },
 
-    getOrder(id) {
-      const s = read(K_SESSION, null);
-      if (!s) return null;
-      return Backend.orders().find(o => o.id === id && o.userId === s.userId) || null;
+    async getOrder(id) {
+      if (!sb || !id) return null;
+      const { data, error } = await sb
+        .from('orders')
+        .select('*, order_items(*), order_tracking_events(*)')
+        .eq('id', id)
+        .maybeSingle();
+      if (error || !data) return null;
+      const o = normalizeOrder(data);
+      o.tracking = (data.order_tracking_events || [])
+        .map(t => ({ estado: t.estado, descripcion: t.descripcion, fecha: t.created_at, actor: t.actor }))
+        .sort((a, b) => String(a.fecha).localeCompare(String(b.fecha)));
+      return o;
     },
 
-    /* Devuelve los pasos del seguimiento marcando los ya alcanzados.
-       Útil para pintar una línea de tiempo aunque el pedido sea reciente. */
+    /* Pasos del seguimiento marcando los alcanzados (función pura). */
     getTrackingSteps(order) {
       if (!order) return [];
       if (order.estado === 'cancelado') {
@@ -256,13 +228,21 @@
       }
       const idx = ORDER_FLOW.indexOf(order.estado);
       return ORDER_FLOW.map((est, i) => ({
-        estado: est,
-        label: ESTADOS[est].label,
-        alcanzado: i <= idx,
-        actual: i === idx,
+        estado: est, label: ESTADOS[est].label, alcanzado: i <= idx, actual: i === idx,
       }));
     },
   };
+
+  /* Traduce algunos errores frecuentes de Supabase al español. */
+  function traducir(error) {
+    const m = (error && error.message) || '';
+    if (/Invalid login credentials/i.test(m)) return 'Correo o contraseña incorrectos.';
+    if (/already registered|already been registered|User already/i.test(m)) return 'Ya existe una cuenta con ese correo.';
+    if (/Email not confirmed/i.test(m)) return 'Debes confirmar tu correo antes de acceder. Revisa tu bandeja de entrada.';
+    if (/Password should be at least/i.test(m)) return 'La contraseña debe tener al menos 6 caracteres.';
+    if (/rate limit|too many/i.test(m)) return 'Demasiados intentos. Inténtalo de nuevo en unos minutos.';
+    return m || 'Ha ocurrido un error. Inténtalo de nuevo.';
+  }
 
   global.Auth = Auth;
 })(window);

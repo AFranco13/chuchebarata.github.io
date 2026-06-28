@@ -220,8 +220,9 @@ document.addEventListener('DOMContentLoaded', () => {
       },
     });
     if (res.reason === 'empty') { showToast('Tu carrito está vacío'); return; }
-    if (res.reason === 'auth') return;          // redirigiendo a login
-    if (res.ok) { cart = {}; sessionStorage.removeItem('kq_cart'); updateCart(); closeCart(); location.href = 'pedido.html?id=' + res.id; }
+    if (res.reason === 'auth' || res.reason === 'redirect') return;   // navegando a login/Stripe
+    if (res.ok) { cart = {}; sessionStorage.removeItem('kq_cart'); updateCart(); closeCart(); location.href = 'pedido.html?id=' + res.id; return; }
+    if (res.error) { showToast(res.error); }
   });
   document.addEventListener('click', e => {
     const q = e.target.closest('[data-q]');

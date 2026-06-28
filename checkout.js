@@ -41,6 +41,21 @@
         cp: d.cp || '', ciudad: d.ciudad || '', provincia: d.provincia || '',
       };
 
+      const cfg = global.SUPABASE_CONFIG || {};
+
+      // ---- Con pago real (Stripe) ----
+      if (cfg.paymentsEnabled) {
+        // 1) Crea el pedido como "pendiente" de pago.
+        const pedido = await Auth.createOrder({ items, direccion, subtotal, envio, total, estado: 'pendiente' });
+        if (!pedido.ok) return pedido;
+        // 2) Crea la sesión de pago y redirige a Stripe.
+        const pago = await Auth.crearSesionPago(pedido.id);
+        if (!pago.ok) return { ok: false, error: pago.error };
+        location.href = pago.url;
+        return { ok: false, reason: 'redirect' };   // ya navegando a Stripe
+      }
+
+      // ---- Sin pago (modo pruebas): el pedido queda confirmado ----
       return Auth.createOrder({ items, direccion, subtotal, envio, total });
     },
   };

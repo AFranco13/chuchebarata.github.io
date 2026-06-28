@@ -184,16 +184,30 @@
     },
 
     /* ---------- pedidos ---------- */
-    async createOrder({ items, direccion, subtotal, envio, total }) {
+    async createOrder({ items, direccion, subtotal, envio, total, estado }) {
       if (!sb) return { ok: false, error: 'Servicio no disponible.' };
       if (!items || !items.length) return { ok: false, error: 'El carrito está vacío.' };
       const { data, error } = await sb.rpc('crear_pedido', {
         p_items: items, p_direccion: direccion,
         p_subtotal: subtotal, p_envio: envio, p_total: total,
+        p_estado: estado || 'confirmado',
       });
       if (error) return { ok: false, error: error.message };
       const row = Array.isArray(data) ? data[0] : data;
       return { ok: true, id: row.id, numero: row.numero };
+    },
+
+    /* Crea una sesión de pago en Stripe (vía Edge Function) y devuelve la
+       URL a la que redirigir al cliente para pagar. */
+    async crearSesionPago(orderId) {
+      if (!sb) return { ok: false, error: 'Servicio no disponible.' };
+      const { data, error } = await sb.functions.invoke('crear-sesion-pago', {
+        body: { orderId, origin: location.origin },
+      });
+      if (error) return { ok: false, error: error.message };
+      if (data && data.error) return { ok: false, error: data.error };
+      if (!data || !data.url) return { ok: false, error: 'No se pudo iniciar el pago.' };
+      return { ok: true, url: data.url };
     },
 
     async getOrders() {

@@ -62,7 +62,13 @@
   const dirHTML = [d.nombre, d.linea1, d.linea2, [d.cp, d.ciudad].filter(Boolean).join(' '), d.provincia, d.telefono]
     .filter(Boolean).map(esc).join('<br>') || 'No se indicó dirección.';
 
+  const pagoOk = new URLSearchParams(location.search).get('pago') === 'ok';
+  const avisoPago = pagoOk
+    ? `<div class="form-msg ok show" style="margin-bottom:18px">¡Pago recibido! Tu pedido está confirmado. Te avisaremos cuando salga.</div>`
+    : '';
+
   cont.innerHTML = `
+    ${avisoPago}
     <a class="back-link" href="perfil.html#pedidos">← Volver a mis pedidos</a>
 
     <div class="order-detail-head">

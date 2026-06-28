@@ -296,8 +296,9 @@ function bindEvents(){
       },
     });
     if(res.reason === 'empty'){ showToast('Tu carrito está vacío'); return; }
-    if(res.reason === 'auth') return;          // redirigiendo a login
-    if(res.ok){ cart = {}; sessionStorage.removeItem('kq_cart'); updateCart(); closeCart(); location.href = 'pedido.html?id=' + res.id; }
+    if(res.reason === 'auth' || res.reason === 'redirect') return;   // navegando a login/Stripe
+    if(res.ok){ cart = {}; sessionStorage.removeItem('kq_cart'); updateCart(); closeCart(); location.href = 'pedido.html?id=' + res.id; return; }
+    if(res.error){ showToast(res.error); }
   });
 
   $('#searchBtn').addEventListener('click', () => {
@@ -335,4 +336,8 @@ document.addEventListener('DOMContentLoaded', () => {
   updateCart();
   bindEvents();
   initReveal();
+
+  if(new URLSearchParams(location.search).get('pago') === 'cancelado'){
+    showToast('Has cancelado el pago. Tu pedido sigue pendiente en tu cuenta.');
+  }
 });

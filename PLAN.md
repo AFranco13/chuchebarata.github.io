@@ -32,11 +32,11 @@ Estado: marca cada casilla al completarla.
 
 ## FASE 3 — Stock automático con las ventas
 
-- [ ] 🤖 Tabla `stock_movements` + RPC `descontar_stock_pedido` / `reponer_stock_pedido`
-- [ ] 🤖 `stripe-webhook`: descuenta stock al confirmar el pago
-- [ ] 🤖 Admin: reponer stock al cancelar/reembolsar
-- [ ] 🤖 Tienda: "Agotado" si `stock ≤ 0`; aviso de stock bajo en el panel
-- [ ] 🧑 Ejecutar SQL + re-desplegar `stripe-webhook` + probar compra
+- [x] 🤖 Tabla `stock_movements` + RPC `descontar_stock_pedido` / `reponer_stock_pedido` (`inventario-5.sql`)
+- [x] 🤖 `stripe-webhook`: descuenta stock al confirmar el pago
+- [x] 🤖 Admin: reponer stock al cancelar (en `actualizar_estado_pedido`)
+- [x] 🤖 Tienda: "Agotado" en portada y ficha; bloqueo de añadir; aviso ⚠ stock bajo en el panel
+- [ ] 🧑 Ejecutar `inventario-5.sql` + re-desplegar `stripe-webhook` + probar compra
 
 ---
 

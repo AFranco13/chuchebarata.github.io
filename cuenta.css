@@ -159,6 +159,11 @@
 .badge.verde{background:#E7F2EC;color:#2C6B4A}
 .badge.rojo{background:#FCEBEF;color:#8A1538}
 
+/* Etiqueta "Agotado" en la rejilla de productos. */
+.agotado-tag{display:inline-flex;align-items:center;font-family:var(--display);font-weight:600;
+  font-size:.82rem;color:#8A1538;background:#FCEBEF;border:1px solid #F2C9D4;
+  padding:6px 12px;border-radius:20px}
+
 /* Botón "Vaciar carrito" (secundario, dentro del carrito). */
 .cart-clear{display:block;width:100%;margin-top:10px;background:none;border:none;
   color:var(--muted);font-family:var(--sans);font-size:.88rem;font-weight:600;

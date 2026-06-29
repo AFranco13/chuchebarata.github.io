@@ -57,6 +57,8 @@ Deno.serve(async (req) => {
         descripcion: 'Hemos recibido tu pago y confirmado el pedido.',
         actor: 'pago',
       });
+      // Descontar el stock vendido (idempotente por pedido).
+      await admin.rpc('descontar_stock_pedido', { p_order_id: orderId });
     }
   }
 

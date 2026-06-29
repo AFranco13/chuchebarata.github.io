@@ -95,10 +95,10 @@ let activeCat = 'todo';
    catálogo de portada (PRODUCTS) y, si no, en el completo (PRODUCTOS_DATA). */
 function cartItemData(id){
   const p = PRODUCTS.find(x => x.id == id);
-  if(p) return { name:p.name, price:p.price, cat:p.cat, img:p.img, art:p.art };
+  if(p) return { name:p.name, price:p.price, cat:p.cat, img:p.img, art:p.art, en_stock:p.en_stock };
   if(typeof PRODUCTOS_DATA !== 'undefined'){
     const d = PRODUCTOS_DATA.find(x => x.id == id);
-    if(d) return { name:d.nombre||d.name, price:d.price, cat:d.cat, img:d.img, art:d.art };
+    if(d) return { name:d.nombre||d.name, price:d.price, cat:d.cat, img:d.img, art:d.art, en_stock:d.en_stock };
   }
   return null;
 }
@@ -140,7 +140,9 @@ function renderProducts(list){
         ${p.allergen ? `<span class="allergen">● Sin gluten</span>` : ''}
         <div class="product-foot">
           <span class="price ${p.old?'sale':''}">${p.old?`<s>${eur(p.old)}</s>`:''}${eur(p.price)}</span>
-          <button class="add" data-add="${p.id}" aria-label="Añadir ${p.name}">${plusIcon}</button>
+          ${p.en_stock === false
+            ? `<span class="agotado-tag">Agotado</span>`
+            : `<button class="add" data-add="${p.id}" aria-label="Añadir ${p.name}">${plusIcon}</button>`}
         </div>
       </div>
     </article>`).join('');
@@ -187,6 +189,8 @@ function findProduct(id){
     || null;
 }
 function addToCart(id){
+  const data = cartItemData(id);
+  if(data && data.en_stock === false){ showToast('Producto agotado'); return; }
   cart[id] = (cart[id]||0) + 1;
   const p = findProduct(id);
   showToast(`${p ? (p.name||p.nombre) : 'Producto'} · añadido`);

@@ -63,7 +63,7 @@ Estado: marca cada casilla al completarla.
 
 ---
 
-## FASE 6 — Pedidos predictivos
+## FASE 6 — Pedidos predictivos · ⏸️ APLAZADA (se retoma más adelante)
 
 - [ ] 🤖 Punto de pedido por producto (con el plazo de cada proveedor)
 - [ ] 🤖 Sugerencias de reposición agrupadas por proveedor

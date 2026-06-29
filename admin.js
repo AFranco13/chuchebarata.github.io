@@ -13,6 +13,23 @@
   const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
   const fechaHora = iso => new Date(iso).toLocaleString('es-ES', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
   const FLOW = ['confirmado', 'preparando', 'enviado', 'entregado', 'cancelado'];
+  const ymd = d => d.toISOString().slice(0, 10);
+  const fechaCorta = iso => new Date(iso + 'T00:00:00').toLocaleDateString('es-ES', { day:'2-digit', month:'short' });
+  const num = n => (Number(n) || 0).toLocaleString('es-ES');
+
+  // Descarga una matriz [[...],[...]] como CSV (separador ; para Excel ES).
+  function descargarCSV(nombre, filas) {
+    const cont = filas.map(f => f.map(c => {
+      const s = String(c == null ? '' : c);
+      return /[;"\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+    }).join(';')).join('\r\n');
+    const blob = new Blob(['﻿' + cont], { type: 'text/csv;charset=utf-8;' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = nombre;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  }
 
   const user = await Auth.requireAuth('admin.html');
   if (!user) return;
@@ -34,7 +51,8 @@
     tabs.forEach(b => b.classList.toggle('active', b.dataset.tab === t));
     if (t === 'pedidos') renderPedidos();
     else if (t === 'productos') renderProductos();
-    else renderProveedores();
+    else if (t === 'proveedores') renderProveedores();
+    else renderInformes();
   }
   tabs.forEach(b => b.addEventListener('click', () => showTab(b.dataset.tab)));
 
@@ -177,6 +195,74 @@
       </button>`).join('')}</div>`;
   }
 
+  /* ===================== INFORMES ===================== */
+  // Periodo por defecto: últimos 30 días.
+  let infDesde = (() => { const d = new Date(); d.setDate(d.getDate() - 29); return ymd(d); })();
+  let infHasta = ymd(new Date());
+  let infDiario = [], infTop = [], infResumen = null;
+
+  async function renderInformes() {
+    cont.innerHTML = '<p style="color:var(--muted)">Cargando informes…</p>';
+    [infResumen, infDiario, infTop] = await Promise.all([
+      Auth.getInformeResumen(infDesde, infHasta),
+      Auth.getInformeDiario(infDesde, infHasta),
+      Auth.getInformeTop(infDesde, infHasta, 20),
+    ]);
+    const r = infResumen || { pedidos: 0, unidades: 0, ingresos: 0, coste: 0, margen: 0 };
+    const maxDia = infDiario.reduce((m, d) => Math.max(m, Number(d.ingresos) || 0), 0) || 1;
+
+    cont.innerHTML = `
+      <div class="admin-toolbar">
+        <div class="admin-filters inf-rango">
+          <label class="inv-filter">Desde <input type="date" id="infDesde" value="${infDesde}" max="${infHasta}"></label>
+          <label class="inv-filter">Hasta <input type="date" id="infHasta" value="${infHasta}" min="${infDesde}" max="${ymd(new Date())}"></label>
+        </div>
+        <button class="btn btn-ghost" id="infCSV" type="button">Exportar CSV</button>
+      </div>
+
+      <div class="inf-cards">
+        <div class="inf-card"><span class="inf-k">Ingresos</span><b>${eur(r.ingresos)}</b></div>
+        <div class="inf-card"><span class="inf-k">Margen</span><b>${eur(r.margen)}</b></div>
+        <div class="inf-card"><span class="inf-k">Pedidos</span><b>${num(r.pedidos)}</b></div>
+        <div class="inf-card"><span class="inf-k">Unidades</span><b>${num(r.unidades)}</b></div>
+      </div>
+
+      <h3 class="inf-h">Ventas por día</h3>
+      ${infDiario.length ? `<div class="inf-bars">${infDiario.map(d => {
+        const h = Math.round((Number(d.ingresos) || 0) / maxDia * 100);
+        return `<div class="inf-bar" title="${fechaCorta(d.dia)}: ${eur(d.ingresos)} · margen ${eur(d.margen)}">
+          <span class="inf-bar-fill" style="height:${Math.max(h, 2)}%"></span>
+          <small>${fechaCorta(d.dia)}</small></div>`;
+      }).join('')}</div>` : `<div class="empty-state">Sin ventas en este periodo.</div>`}
+
+      <h3 class="inf-h">Más vendidos</h3>
+      ${infTop.length ? `<div class="inv-wrap"><table class="inv-table">
+        <thead><tr><th>Producto</th><th>Unidades</th><th>Ingresos</th><th>Margen</th></tr></thead>
+        <tbody>${infTop.map(p => `<tr>
+          <td>${esc(p.nombre || '—')}</td>
+          <td>${num(p.unidades)}</td>
+          <td>${eur(p.ingresos)}</td>
+          <td>${eur(p.margen)}</td></tr>`).join('')}</tbody>
+      </table></div>` : `<div class="empty-state">Sin ventas en este periodo.</div>`}`;
+  }
+
+  function exportarInformeCSV() {
+    const filas = [['Informe El Kiosquillo', `${infDesde} a ${infHasta}`], []];
+    const r = infResumen || {};
+    filas.push(['Resumen']);
+    filas.push(['Ingresos', 'Margen', 'Coste', 'Pedidos', 'Unidades']);
+    filas.push([r.ingresos || 0, r.margen || 0, r.coste || 0, r.pedidos || 0, r.unidades || 0]);
+    filas.push([]);
+    filas.push(['Ventas por día']);
+    filas.push(['Día', 'Pedidos', 'Unidades', 'Ingresos', 'Margen']);
+    infDiario.forEach(d => filas.push([d.dia, d.pedidos, d.unidades, d.ingresos, d.margen]));
+    filas.push([]);
+    filas.push(['Más vendidos']);
+    filas.push(['Producto', 'Unidades', 'Ingresos', 'Margen']);
+    infTop.forEach(p => filas.push([p.nombre, p.unidades, p.ingresos, p.margen]));
+    descargarCSV(`informe-${infDesde}_${infHasta}.csv`, filas);
+  }
+
   /* ===================== EVENTOS (delegación) ===================== */
   document.addEventListener('click', async e => {
     // --- Pedidos ---
@@ -242,10 +328,15 @@
     // --- Proveedores ---
     const prov = e.target.closest('.admin-prov');
     if (prov) { filtroProv = prov.dataset.prov || 'todos'; showTab('productos'); return; }
+
+    // --- Informes ---
+    if (e.target.id === 'infCSV') { exportarInformeCSV(); return; }
   });
 
   document.addEventListener('change', e => {
     if (e.target.id === 'provFilter') { filtroProv = e.target.value; renderProductos(); }
+    if (e.target.id === 'infDesde') { infDesde = e.target.value; if (infDesde > infHasta) infHasta = infDesde; renderInformes(); }
+    if (e.target.id === 'infHasta') { infHasta = e.target.value; if (infHasta < infDesde) infDesde = infHasta; renderInformes(); }
   });
 
   document.addEventListener('input', e => {

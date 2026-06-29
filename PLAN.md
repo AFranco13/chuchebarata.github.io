@@ -26,7 +26,7 @@ Estado: marca cada casilla al completarla.
 - [x] 🤖 Vista **"Proveedores"** (nº productos, valor stock, plazo) → sus productos
 - [x] 🤖 Coste y margen por producto en el listado admin
 - [ ] 🧑 Ejecutar `inventario-3.sql` y probar
-- [ ] 🤖 *(siguiente)* que los productos nuevos del admin aparezcan en la tienda (escaparate desde la BD)
+- [x] 🤖 Escaparate desde la BD: altas/bajas/precio/stock del admin se reflejan en la tienda (`fusionarCatalogo`)
 
 ---
 
@@ -42,8 +42,10 @@ Estado: marca cada casilla al completarla.
 
 ## FASE 4 — Informes
 
-- [ ] 🤖 Ventas por día, más vendidos, margen (precio − coste)
-- [ ] 🤖 Exportar a CSV
+- [x] 🤖 SQL `inventario-7.sql`: RPCs solo-admin `informe_resumen` / `informe_ventas_diarias` / `informe_mas_vendidos`
+- [x] 🤖 Admin: pestaña **Informes** (resumen, ventas por día, más vendidos, margen) con selector de fechas
+- [x] 🤖 Exportar a CSV
+- [ ] 🧑 Ejecutar `inventario-7.sql` en Supabase
 
 ---
 
@@ -78,4 +80,4 @@ Estado: marca cada casilla al completarla.
 - `ARQUITECTURA.md` — visión global del e-commerce
 - `INVENTARIO.md` — diseño de inventario, proveedores, compras y WAC
 - `PAGOS-STRIPE.md` — configuración de la pasarela de pago
-- `supabase-schema.sql` · `supabase-admin.sql` · `supabase-pagos.sql` · `inventario-1.sql` — SQL a ejecutar en Supabase
+- `supabase-schema.sql` · `supabase-admin.sql` · `supabase-pagos.sql` · `inventario-1.sql`…`inventario-7.sql` — SQL a ejecutar en Supabase

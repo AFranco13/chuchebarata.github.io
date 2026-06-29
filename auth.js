@@ -328,6 +328,29 @@
       return data.map(normalizeOrder);
     },
 
+    /* ---------- informes (admin) ---------- */
+    /* Resumen del periodo: {pedidos, unidades, ingresos, coste, margen}. */
+    async getInformeResumen(desde, hasta) {
+      if (!sb) return null;
+      const { data, error } = await sb.rpc('informe_resumen', { p_desde: desde, p_hasta: hasta });
+      if (error || !data || !data.length) return null;
+      return data[0];
+    },
+    /* Ventas por día: [{dia, pedidos, unidades, ingresos, margen}]. */
+    async getInformeDiario(desde, hasta) {
+      if (!sb) return [];
+      const { data, error } = await sb.rpc('informe_ventas_diarias', { p_desde: desde, p_hasta: hasta });
+      if (error || !data) return [];
+      return data;
+    },
+    /* Más vendidos: [{product_id, nombre, unidades, ingresos, margen}]. */
+    async getInformeTop(desde, hasta, limite) {
+      if (!sb) return [];
+      const { data, error } = await sb.rpc('informe_mas_vendidos', { p_desde: desde, p_hasta: hasta, p_limite: limite || 20 });
+      if (error || !data) return [];
+      return data;
+    },
+
     /* ---------- inventario (admin) ---------- */
     /* Todos los productos con coste, proveedor y margen (vista_inventario). */
     async getInventario() {

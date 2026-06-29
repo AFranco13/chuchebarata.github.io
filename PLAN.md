@@ -9,12 +9,12 @@ Estado: marca cada casilla al completarla.
 
 - [x] 🤖 SQL `inventario-1.sql`: tablas `products` y `suppliers` + RLS + vista `vista_inventario`
 - [x] 🤖 Migración del catálogo (32 productos + 10 proveedores desde la marca; stock inicial 100, mínimo 20)
-- [ ] 🧑 Ejecutar `inventario-1.sql` en el SQL Editor de Supabase
-- [ ] 🤖 `auth.js`: `getProductos()` / `getProducto(id)` (lee de Supabase, con respaldo a `productos_data.js`)
-- [ ] 🤖 Tienda lee de la BD: `app.js`, `producto.js`, `caja.js` (precio y stock en vivo, respaldo al fichero)
-- [ ] 🤖 Blindaje: `crear_pedido` toma el **precio desde `products`** (ignora el del navegador) + FK `order_items.product_id → products`
-- [ ] 🧑 Ejecutar el SQL actualizado de `crear_pedido`
-- [ ] 🤖 Validar y subir
+- [x] 🧑 Ejecutar `inventario-1.sql` en el SQL Editor de Supabase ✓ (32 filas)
+- [x] 🤖 `auth.js`: `getProductos()` / `getProducto(id)` + `aplicarInventario()` (con respaldo a `productos_data.js`)
+- [x] 🤖 Tienda lee de la BD: `app.js`, `producto.js`, `caja.js` (precio y stock en vivo, respaldo al fichero)
+- [x] 🤖 Blindaje: `crear_pedido` toma el **precio desde `products`** y recalcula totales (`inventario-2.sql`)
+- [ ] 🧑 Ejecutar `inventario-2.sql` en Supabase
+- [x] 🤖 Validar y subir
 
 ---
 

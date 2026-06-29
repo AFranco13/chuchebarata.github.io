@@ -205,7 +205,10 @@ function renderSugerencias() {
 }
 
 /* ── init ────────────────────────────────────────────────── */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+
+  // Precio y stock en vivo desde la BD (con respaldo a los datos del fichero).
+  if (window.Auth) { try { await Auth.aplicarInventario(PRODUCTOS_DATA); } catch (e) {} }
 
   /* carrito */
   updateCart();

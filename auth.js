@@ -262,6 +262,28 @@
       };
     },
 
+    /* Superpone precio/stock en vivo (de la BD) sobre los catálogos en
+       memoria (PRODUCTS / PRODUCTOS_DATA). Devuelve true si aplicó datos.
+       Si la BD no responde o está vacía, no toca nada (respaldo seguro). */
+    async aplicarInventario(...arrays) {
+      const live = await this.getProductos();
+      if (!live.length) return false;
+      const map = {};
+      live.forEach(p => { map[p.id] = p; });
+      arrays.forEach(arr => {
+        if (!Array.isArray(arr)) return;
+        arr.forEach(item => {
+          const u = map[item.id];
+          if (!u) return;
+          item.price = u.price;
+          item.stock = u.stock;
+          item.en_stock = u.en_stock;
+          if (u.precio_comp != null) item.precio_comp = u.precio_comp;
+        });
+      });
+      return true;
+    },
+
     /* ---------- administración ---------- */
     /* Todos los pedidos (solo administradores; la RLS lo garantiza). */
     async getAllOrders() {

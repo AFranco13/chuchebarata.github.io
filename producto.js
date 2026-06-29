@@ -240,11 +240,14 @@ function injectJsonLd(p, url, image, desc) {
 }
 
 /* ── init ─────────────────────────────────────────────────── */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   if (typeof PRODUCTOS_DATA === 'undefined') {
     $('#pdMain').innerHTML = '<div class="pd-skeleton">No se pudieron cargar los datos del producto.</div>';
     return;
   }
+
+  // Precio y stock en vivo desde la BD (con respaldo a los datos del fichero).
+  if (window.Auth) { try { await Auth.aplicarInventario(PRODUCTOS_DATA); } catch (e) {} }
 
   const idParam = parseInt(getParam('id'), 10);
   const p = PRODUCTOS_DATA.find(x => x.id === idParam);

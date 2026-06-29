@@ -348,4 +348,11 @@ document.addEventListener('DOMContentLoaded', () => {
   if(new URLSearchParams(location.search).get('pago') === 'cancelado'){
     showToast('Has cancelado el pago. Tu pedido sigue pendiente en tu cuenta.');
   }
+
+  // Precio y stock en vivo desde la BD: re-render al llegar (no bloquea).
+  if(window.Auth){
+    Auth.aplicarInventario(PRODUCTS, typeof PRODUCTOS_DATA !== 'undefined' ? PRODUCTOS_DATA : null)
+      .then(ok => { if(ok){ if($('#productGrid')) refresh(); updateCart(); } })
+      .catch(() => {});
+  }
 });

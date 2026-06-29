@@ -306,6 +306,16 @@ function bindEvents(){
       if(nav){ nav.classList.remove('open'); if($('#menuBtn')) $('#menuBtn').setAttribute('aria-expanded','false'); }
     }
 
+    // Logo/enlaces a #top: subir al inicio sin el salto del ancla (el header
+    // es sticky, así que anclar a #top desplazaba ligeramente la página).
+    const toTop = e.target.closest('a[href="#top"]');
+    if(toTop){
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if(history.replaceState) history.replaceState(null, '', location.pathname + location.search);
+      return;
+    }
+
     const add = e.target.closest('[data-add]');
     if(add){ addToCart(+add.dataset.add); return; }
 

@@ -18,5 +18,5 @@ window.SUPABASE_CONFIG = {
   /* Pon esto en true SOLO cuando hayas desplegado las Edge Functions de
      pago y configurado los secretos (ver PAGOS-STRIPE.md). Mientras esté
      en false, el pedido se crea sin cobro (modo pruebas). */
-  paymentsEnabled: false,
+  paymentsEnabled: true,
 };

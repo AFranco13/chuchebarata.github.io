@@ -201,8 +201,12 @@
        URL a la que redirigir al cliente para pagar. */
     async crearSesionPago(orderId) {
       if (!sb) return { ok: false, error: 'Servicio no disponible.' };
+      // Base = carpeta donde vive la web (soporta subcarpetas de GitHub Pages,
+      // p. ej. /chuchebarata.github.io/). Termina en "/".
+      const dir = location.pathname.slice(0, location.pathname.lastIndexOf('/') + 1);
+      const base = location.origin + dir;
       const { data, error } = await sb.functions.invoke('crear-sesion-pago', {
-        body: { orderId, origin: location.origin },
+        body: { orderId, base },
       });
       if (error) return { ok: false, error: error.message };
       if (data && data.error) return { ok: false, error: data.error };

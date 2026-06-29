@@ -38,8 +38,12 @@ Deno.serve(async (req) => {
     const { data: { user } } = await userClient.auth.getUser();
     if (!user) return json({ error: 'No autenticado' }, 401);
 
-    const { orderId, origin } = await req.json();
+    const { orderId, base } = await req.json();
     if (!orderId) return json({ error: 'Falta el pedido' }, 400);
+
+    // Base de la web (incluye subcarpeta si la hay). Debe acabar en "/".
+    let site = base || SUPABASE_URL;
+    if (!site.endsWith('/')) site += '/';
 
     // Lee el pedido con permisos de servicio (fuente de verdad de los importes).
     const admin = createClient(SUPABASE_URL, SERVICE_KEY);
@@ -69,14 +73,13 @@ Deno.serve(async (req) => {
       });
     }
 
-    const base = origin || SUPABASE_URL;
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       line_items,
       // Sin payment_method_types: Stripe muestra los métodos activados en tu
       // panel (tarjeta y, cuando lo actives, Bizum / Apple Pay / Google Pay).
-      success_url: `${base}/pedido.html?id=${order.id}&pago=ok`,
-      cancel_url: `${base}/index.html?pago=cancelado`,
+      success_url: `${site}pedido.html?id=${order.id}&pago=ok`,
+      cancel_url: `${site}index.html?pago=cancelado`,
       client_reference_id: order.id,
       locale: 'es',
       metadata: { order_id: order.id, user_id: user.id },

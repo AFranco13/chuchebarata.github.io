@@ -316,6 +316,12 @@
       return error ? { ok: false, error: error.message } : { ok: true };
     },
 
+    async eliminarProducto(id) {
+      if (!sb) return { ok: false, error: 'Servicio no disponible.' };
+      const { error } = await sb.rpc('eliminar_producto', { p_id: id });
+      return error ? { ok: false, error: error.message } : { ok: true };
+    },
+
     async ajustarStock(id, delta, motivo) {
       if (!sb) return { ok: false, error: 'Servicio no disponible.' };
       const { error } = await sb.rpc('ajustar_stock', { p_id: id, p_delta: delta, p_motivo: motivo || 'ajuste' });

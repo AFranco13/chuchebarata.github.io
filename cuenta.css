@@ -205,6 +205,11 @@
 .inv-in{padding:7px 9px;border:1.5px solid var(--line);border-radius:8px;font-family:var(--sans);font-size:.9rem}
 .inv-in:focus{outline:none;border-color:var(--wine)}
 .inv-table .btn{padding:7px 14px;font-size:.85rem}
+.inv-acciones{white-space:nowrap;display:flex;gap:8px;align-items:center}
+.inv-del{background:none;border:none;color:#8A1538;font-family:var(--sans);font-weight:600;
+  font-size:.84rem;cursor:pointer;padding:6px 8px;border-radius:8px;transition:background .15s}
+.inv-del:hover{background:#FCEBEF}
+.inv-del:disabled{opacity:.5;cursor:not-allowed}
 .inv-bajo{color:#9A5B16}
 .inv-alta input{padding:7px 9px;border:1.5px solid var(--line-strong);border-radius:8px;width:120px}
 .admin-prov{width:100%;border:1px solid var(--line);background:#fff}

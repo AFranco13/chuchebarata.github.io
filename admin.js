@@ -145,7 +145,10 @@
               <td><input class="inv-in" data-f="precio" type="number" step="0.01" value="${Number(p.precio).toFixed(2)}" style="width:74px"></td>
               <td>${eur(p.margen_eur)}</td>
               <td style="text-align:center"><input class="inv-in" data-f="activo" type="checkbox" ${p.activo?'checked':''}></td>
-              <td><button class="btn btn-primary inv-save" type="button">Guardar</button></td>
+              <td class="inv-acciones">
+                <button class="btn btn-primary inv-save" type="button">Guardar</button>
+                <button class="inv-del" type="button" title="Eliminar producto" aria-label="Eliminar ${esc(p.nombre)}">Eliminar</button>
+              </td>
             </tr>`;
           }).join('')}
         </tbody>
@@ -206,6 +209,19 @@
       mostrarAlta = false; inventario = []; renderProductos();
       return;
     }
+    const invDel = e.target.closest('.inv-del');
+    if (invDel) {
+      const row = invDel.closest('.inv-row'); const id = +row.dataset.id;
+      const nombre = row.querySelector('td')?.textContent || 'este producto';
+      if (!confirm(`¿Eliminar "${nombre.trim()}"? Esta acción no se puede deshacer.`)) return;
+      invDel.disabled = true;
+      const res = await Auth.eliminarProducto(id);
+      invDel.disabled = false;
+      if (!res.ok) { alert(res.error); return; }
+      inventario = []; renderProductos();
+      return;
+    }
+
     const invSave = e.target.closest('.inv-save');
     if (invSave) {
       const row = invSave.closest('.inv-row'); const id = +row.dataset.id;

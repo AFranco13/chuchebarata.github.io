@@ -233,6 +233,26 @@
 .inf-ytick,.inf-xtick{fill:var(--muted);font-family:var(--sans);font-size:11px}
 @media(max-width:640px){.inf-cards{grid-template-columns:repeat(2,1fr)}}
 
+/* ===================== COMPRAS A PROVEEDOR ===================== */
+.cmp-form{margin-bottom:24px}
+.cmp-row{margin-bottom:16px}
+.cmp-empty{color:var(--muted);font-size:.9rem;padding:8px 0}
+.cmp-tramos{background:var(--bg);border:1px solid var(--line);border-radius:var(--r-sm);padding:14px 16px;margin-bottom:18px}
+.cmp-tramos h4{font-family:var(--display);font-size:.98rem;margin-bottom:10px}
+.cmp-tramos-list{list-style:none;display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.cmp-tramos-list li{background:#fff;border:1px solid var(--line);border-radius:20px;padding:5px 12px;font-size:.85rem;font-weight:600;display:flex;align-items:center;gap:8px}
+.cmp-del-tramo{color:#8A1538;font-size:.9rem}
+.cmp-tramo-add{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.cmp-tramo-add input{padding:8px 11px;border:1.5px solid var(--line);border-radius:var(--r-sm);font-family:var(--sans);font-size:.9rem}
+.cmp-lineas-tabla{margin-bottom:12px}
+.cmp-lineas-tabla input{padding:7px 9px;border:1.5px solid var(--line);border-radius:8px;font-family:var(--sans);font-size:.9rem}
+.cmp-add-linea{display:flex;gap:8px;align-items:center;margin-bottom:20px;flex-wrap:wrap}
+.cmp-add-linea select{padding:9px 12px;border:1.5px solid var(--line);border-radius:var(--r-sm);background:#fff;font-family:var(--sans);font-size:.9rem;min-width:240px;max-width:100%}
+.cmp-pie{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:18px}
+.cmp-pie .order-totals{min-width:260px;flex:1;max-width:340px;border-top:none;margin:0;padding:0}
+.cmp-acciones{display:flex;gap:14px;align-items:center}
+@media(max-width:560px){.cmp-pie{flex-direction:column;align-items:stretch}.cmp-pie .order-totals{max-width:none}}
+
 /* ===================== DETALLE / SEGUIMIENTO DE PEDIDO ===================== */
 .order-detail{max-width:760px;margin:0 auto}
 .back-link{color:var(--muted);font-weight:600;font-size:.9rem;display:inline-flex;gap:6px;margin-bottom:18px}

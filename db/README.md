@@ -21,6 +21,7 @@ lanzarlos sin romper nada.
 | 8 | `inventario-5.sql` | `stock_movements` + descuento/reposición de stock con las ventas |
 | 9 | `inventario-6.sql` | `eliminar_producto` (borrado seguro desde el panel) |
 | 10 | `inventario-7.sql` | Informes: `informe_resumen`, `informe_ventas_diarias`, `informe_mas_vendidos` |
+| 11 | `inventario-8.sql` | Compras a proveedor: pedidos de compra, tramos de descuento y recepción con coste medio (WAC) |
 
 ## Edge Functions
 

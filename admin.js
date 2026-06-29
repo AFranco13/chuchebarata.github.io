@@ -94,6 +94,7 @@
     if (t === 'pedidos') renderPedidos();
     else if (t === 'productos') renderProductos();
     else if (t === 'proveedores') renderProveedores();
+    else if (t === 'compras') renderCompras();
     else renderInformes();
   }
   tabs.forEach(b => b.addEventListener('click', () => showTab(b.dataset.tab)));
@@ -300,6 +301,142 @@
     descargarCSV(`informe-${infDesde}_${infHasta}.csv`, filas);
   }
 
+  /* ===================== COMPRAS A PROVEEDOR ===================== */
+  let compras = [], tramosAll = [];
+  let nuevaCompra = false, compraProv = '', compraLineas = [], compraPortes = 0;
+
+  // Tramos del proveedor seleccionado, ordenados por umbral.
+  const tramosDe = pid => tramosAll.filter(t => String(t.proveedor_id) === String(pid))
+    .sort((a, b) => a.umbral_eur - b.umbral_eur);
+  // % de descuento aplicable a un subtotal según los tramos del proveedor.
+  const dtoDe = (pid, subtotal) => tramosDe(pid).filter(t => Number(t.umbral_eur) <= subtotal)
+    .reduce((m, t) => Math.max(m, Number(t.descuento_pct)), 0);
+  // Lee las líneas actuales del DOM (cantidad y coste editables).
+  function leerLineas() {
+    return [...document.querySelectorAll('.cmp-linea')].map(r => ({
+      product_id: +r.dataset.pid,
+      cantidad: parseInt(r.querySelector('[data-f=cant]').value, 10) || 0,
+      coste_bruto: parseFloat(r.querySelector('[data-f=bruto]').value) || 0,
+    }));
+  }
+  function calcTotales() {
+    const lineas = leerLineas();
+    const subtotal = lineas.reduce((s, l) => s + l.cantidad * l.coste_bruto, 0);
+    const dto = dtoDe(compraProv, subtotal);
+    const portes = parseFloat((document.getElementById('cmpPortes') || {}).value) || 0;
+    const total = subtotal * (1 - dto / 100) + portes;
+    return { subtotal, dto, portes, total };
+  }
+  function pintarTotales() {
+    const box = document.getElementById('cmpTotales');
+    if (!box) return;
+    const t = calcTotales();
+    box.innerHTML = `
+      <div class="tr"><span>Subtotal (bruto)</span><b>${eur(t.subtotal)}</b></div>
+      <div class="tr"><span>Descuento proveedor</span><b>${t.dto ? '−' + t.dto + ' %' : '—'}</b></div>
+      <div class="tr"><span>Portes</span><b>${eur(t.portes)}</b></div>
+      <div class="tr grand"><span>Total estimado</span><b>${eur(t.total)}</b></div>`;
+  }
+
+  async function cargarCompras() {
+    [compras, tramosAll] = await Promise.all([Auth.getCompras(), Auth.getTramos()]);
+    await cargarInventario();
+  }
+
+  function formNuevaCompra() {
+    const provs = proveedoresUnicos();
+    const prods = compraProv ? inventario.filter(p => String(p.proveedor_id) === String(compraProv)) : [];
+    const tramos = compraProv ? tramosDe(compraProv) : [];
+
+    const filasLineas = compraLineas.map((l, i) => {
+      const p = inventario.find(x => x.id === l.product_id) || {};
+      return `<tr class="cmp-linea" data-pid="${l.product_id}">
+        <td>${esc(p.nombre || '—')}</td>
+        <td><input data-f="cant" type="number" min="1" value="${l.cantidad || ''}" style="width:80px"></td>
+        <td><input data-f="bruto" type="number" step="0.0001" value="${l.coste_bruto != null ? l.coste_bruto : ''}" style="width:90px"></td>
+        <td><button class="muted-link cmp-quita" data-i="${i}" type="button">Quitar</button></td>
+      </tr>`;
+    }).join('');
+
+    const opcionesProd = prods
+      .filter(p => !compraLineas.some(l => l.product_id === p.id))
+      .map(p => `<option value="${p.id}">${esc(p.nombre)} · coste ${eur(p.precio_coste)}</option>`).join('');
+
+    return `<div class="panel-card cmp-form">
+      <div class="cmp-row">
+        <label class="inv-filter">Proveedor:
+          <select id="cmpProv">
+            <option value="">— Elige —</option>
+            ${provs.map(([id, nom]) => `<option value="${id}"${String(compraProv) === String(id) ? ' selected' : ''}>${esc(nom)}</option>`).join('')}
+          </select>
+        </label>
+      </div>
+
+      ${compraProv ? `
+        <div class="cmp-tramos">
+          <h4>Tramos de descuento de este proveedor</h4>
+          ${tramos.length ? `<ul class="cmp-tramos-list">${tramos.map(t =>
+            `<li>≥ ${eur(t.umbral_eur)} → ${Number(t.descuento_pct)} %
+              <button class="muted-link cmp-del-tramo" data-id="${t.id}" type="button">✕</button></li>`).join('')}</ul>`
+            : '<p class="cmp-empty">Sin tramos. Sin descuento por volumen.</p>'}
+          <div class="cmp-tramo-add">
+            <input id="cmpUmbral" type="number" step="0.01" placeholder="Umbral € (p. ej. 200)" style="width:170px">
+            <input id="cmpPct" type="number" step="0.01" placeholder="% (p. ej. 10)" style="width:120px">
+            <button class="btn btn-ghost" id="cmpAddTramo" type="button">Añadir tramo</button>
+          </div>
+        </div>
+
+        <table class="inv-table cmp-lineas-tabla">
+          <thead><tr><th>Producto</th><th>Cantidad</th><th>Coste bruto/ud</th><th></th></tr></thead>
+          <tbody>${filasLineas || '<tr><td colspan="4" class="cmp-empty">Añade productos al pedido.</td></tr>'}</tbody>
+        </table>
+        <div class="cmp-add-linea">
+          <select id="cmpProd">${opcionesProd || '<option value="">(no quedan productos)</option>'}</select>
+          <button class="btn btn-ghost" id="cmpAddLinea" type="button">+ Añadir línea</button>
+        </div>
+
+        <div class="cmp-pie">
+          <label class="inv-filter">Portes (€): <input id="cmpPortes" type="number" step="0.01" value="${compraPortes || ''}" style="width:110px"></label>
+          <div class="order-totals" id="cmpTotales"></div>
+        </div>
+
+        <div class="cmp-acciones">
+          <button class="btn btn-primary" id="cmpCrear" type="button">Crear pedido (borrador)</button>
+          <button class="muted-link" id="cmpCancelarForm" type="button">Cancelar</button>
+        </div>
+      ` : '<p class="cmp-empty">Elige un proveedor para empezar el pedido.</p>'}
+    </div>`;
+  }
+
+  function badgeCompra(estado) {
+    const m = { borrador: 'gris', recibido: 'verde', cancelado: 'rojo' };
+    return `<span class="badge ${m[estado] || 'gris'}">${estado}</span>`;
+  }
+
+  async function renderCompras() {
+    cont.innerHTML = '<p style="color:var(--muted)">Cargando compras…</p>';
+    await cargarCompras();
+    cont.innerHTML = `
+      <div class="admin-toolbar">
+        <h3 class="inf-h" style="margin:0">Pedidos de compra</h3>
+        <button class="btn btn-ghost" id="cmpNuevo" type="button">${nuevaCompra ? 'Cerrar' : '+ Nuevo pedido de compra'}</button>
+      </div>
+      ${nuevaCompra ? formNuevaCompra() : ''}
+      ${compras.length ? `<div class="order-list">${compras.map(c => `
+        <div class="order-card admin-card" data-cid="${c.id}">
+          <div class="o-main"><b>${esc(c.numero)}</b>
+            <small>${fechaHora(c.created_at)} · ${esc(c.proveedor || 'Sin proveedor')} · ${c.lineas} línea${c.lineas !== 1 ? 's' : ''}${c.descuento_pct ? ` · −${Number(c.descuento_pct)}%` : ''} · ${eur(c.total)}</small></div>
+          <div class="admin-actions">${badgeCompra(c.estado)}
+            ${c.estado === 'borrador'
+              ? `<button class="btn btn-primary cmp-recibir" type="button">Recibir</button>
+                 <button class="inv-del cmp-borrar" type="button">Borrar</button>`
+              : c.recibido_at ? `<small class="muted-link" style="cursor:default">recibido ${fechaHora(c.recibido_at)}</small>` : ''}
+          </div>
+        </div>`).join('')}</div>`
+        : (nuevaCompra ? '' : '<div class="empty-state"><b>Sin pedidos de compra</b>Crea uno para reponer stock.</div>')}`;
+    if (nuevaCompra && compraProv) pintarTotales();
+  }
+
   /* ===================== EVENTOS (delegación) ===================== */
   document.addEventListener('click', async e => {
     // --- Pedidos ---
@@ -368,16 +505,87 @@
 
     // --- Informes ---
     if (e.target.id === 'infCSV') { exportarInformeCSV(); return; }
+
+    // --- Compras ---
+    if (e.target.id === 'cmpNuevo') {
+      nuevaCompra = !nuevaCompra;
+      if (!nuevaCompra) { compraProv = ''; compraLineas = []; compraPortes = 0; }
+      renderCompras(); return;
+    }
+    if (e.target.id === 'cmpCancelarForm') {
+      nuevaCompra = false; compraProv = ''; compraLineas = []; compraPortes = 0; renderCompras(); return;
+    }
+    if (e.target.id === 'cmpAddLinea') {
+      const sel = document.getElementById('cmpProd'); const pid = +(sel && sel.value);
+      if (!pid) return;
+      const p = inventario.find(x => x.id === pid) || {};
+      compraLineas = leerLineas();                 // conserva lo ya escrito
+      compraPortes = (calcTotales().portes) || 0;
+      compraLineas.push({ product_id: pid, cantidad: 1, coste_bruto: Number(p.precio_coste) || 0 });
+      renderCompras(); return;
+    }
+    const quita = e.target.closest('.cmp-quita');
+    if (quita) {
+      compraPortes = (calcTotales().portes) || 0;
+      compraLineas = leerLineas(); compraLineas.splice(+quita.dataset.i, 1);
+      renderCompras(); return;
+    }
+    if (e.target.id === 'cmpAddTramo') {
+      const u = parseFloat((document.getElementById('cmpUmbral') || {}).value);
+      const pct = parseFloat((document.getElementById('cmpPct') || {}).value);
+      if (!(u >= 0) || !(pct >= 0)) { alert('Indica un umbral y un % válidos.'); return; }
+      const res = await Auth.crearTramo(+compraProv, u, pct);
+      if (!res.ok) { alert('Error: ' + res.error); return; }
+      compraLineas = leerLineas(); compraPortes = (calcTotales().portes) || 0;
+      tramosAll = await Auth.getTramos(); renderCompras(); return;
+    }
+    const delT = e.target.closest('.cmp-del-tramo');
+    if (delT) {
+      const res = await Auth.eliminarTramo(+delT.dataset.id);
+      if (!res.ok) { alert('Error: ' + res.error); return; }
+      compraLineas = leerLineas(); compraPortes = (calcTotales().portes) || 0;
+      tramosAll = await Auth.getTramos(); renderCompras(); return;
+    }
+    if (e.target.id === 'cmpCrear') {
+      const lineas = leerLineas().filter(l => l.product_id && l.cantidad > 0);
+      if (!lineas.length) { alert('Añade al menos una línea con cantidad.'); return; }
+      const portes = calcTotales().portes;
+      e.target.disabled = true; e.target.textContent = 'Creando…';
+      const res = await Auth.crearCompra(+compraProv, lineas, portes, null);
+      if (!res.ok) { e.target.disabled = false; e.target.textContent = 'Crear pedido (borrador)'; alert('Error: ' + res.error); return; }
+      nuevaCompra = false; compraProv = ''; compraLineas = []; compraPortes = 0;
+      renderCompras(); return;
+    }
+    const recibir = e.target.closest('.cmp-recibir');
+    if (recibir) {
+      const id = recibir.closest('.admin-card').dataset.cid;
+      if (!confirm('¿Recibir la mercancía? Se sumará al stock y se recalculará el coste medio. No se puede deshacer.')) return;
+      recibir.disabled = true; recibir.textContent = 'Recibiendo…';
+      const res = await Auth.recibirCompra(id);
+      if (!res.ok) { recibir.disabled = false; recibir.textContent = 'Recibir'; alert('Error: ' + res.error); return; }
+      inventario = []; renderCompras(); return;       // refresca costes/stock
+    }
+    const borrar = e.target.closest('.cmp-borrar');
+    if (borrar) {
+      const id = borrar.closest('.admin-card').dataset.cid;
+      if (!confirm('¿Borrar este pedido de compra en borrador?')) return;
+      const res = await Auth.cancelarCompra(id);
+      if (!res.ok) { alert('Error: ' + res.error); return; }
+      renderCompras(); return;
+    }
   });
 
   document.addEventListener('change', e => {
     if (e.target.id === 'provFilter') { filtroProv = e.target.value; renderProductos(); }
     if (e.target.id === 'infDesde') { infDesde = e.target.value; if (infDesde > infHasta) infHasta = infDesde; renderInformes(); }
     if (e.target.id === 'infHasta') { infHasta = e.target.value; if (infHasta < infDesde) infDesde = infHasta; renderInformes(); }
+    if (e.target.id === 'cmpProv') { compraProv = e.target.value; compraLineas = []; compraPortes = 0; renderCompras(); }
   });
 
   document.addEventListener('input', e => {
     if (e.target.id === 'prodSearch') { buscarProd = e.target.value; aplicarBusqueda(); }
+    // Recalcula los totales del pedido de compra sin re-renderizar (no pierde el foco).
+    if (e.target.matches('.cmp-linea [data-f], #cmpPortes')) pintarTotales();
   });
 
   // arranque

@@ -384,6 +384,67 @@
       return error ? { ok: false, error: error.message } : { ok: true };
     },
 
+    /* ---------- compras a proveedor (admin) ---------- */
+    /* Pedidos de compra con proveedor y nº de líneas (vista_compras). */
+    async getCompras() {
+      if (!sb) return [];
+      const { data, error } = await sb.from('vista_compras').select('*').order('created_at', { ascending: false });
+      if (error || !data) return [];
+      return data;
+    },
+    /* Un pedido de compra con sus líneas (incluye nombre de producto). */
+    async getCompra(id) {
+      if (!sb || !id) return null;
+      const { data, error } = await sb
+        .from('purchase_orders')
+        .select('*, purchase_order_items(*, products(nombre, precio_coste))')
+        .eq('id', id).maybeSingle();
+      if (error || !data) return null;
+      return data;
+    },
+    /* Crea un pedido de compra (borrador). items: [{product_id, cantidad, coste_bruto}]. */
+    async crearCompra(proveedorId, items, portes, nota) {
+      if (!sb) return { ok: false, error: 'Servicio no disponible.' };
+      const { data, error } = await sb.rpc('crear_pedido_compra', {
+        p_proveedor_id: proveedorId, p_items: items, p_portes: portes || 0, p_nota: nota || null,
+      });
+      if (error) return { ok: false, error: error.message };
+      const row = Array.isArray(data) ? data[0] : data;
+      return { ok: true, id: row && row.id, numero: row && row.numero };
+    },
+    /* Recibe la mercancía: aplica descuento/portes y recalcula el WAC. */
+    async recibirCompra(id) {
+      if (!sb) return { ok: false, error: 'Servicio no disponible.' };
+      const { error } = await sb.rpc('recibir_pedido_compra', { p_po_id: id });
+      return error ? { ok: false, error: error.message } : { ok: true };
+    },
+    /* Borra un pedido de compra en borrador. */
+    async cancelarCompra(id) {
+      if (!sb) return { ok: false, error: 'Servicio no disponible.' };
+      const { error } = await sb.rpc('cancelar_pedido_compra', { p_po_id: id });
+      return error ? { ok: false, error: error.message } : { ok: true };
+    },
+    /* Tramos de descuento de un proveedor (o todos si no se indica). */
+    async getTramos(proveedorId) {
+      if (!sb) return [];
+      let q = sb.from('supplier_discount_tiers').select('*').order('umbral_eur');
+      if (proveedorId) q = q.eq('proveedor_id', proveedorId);
+      const { data, error } = await q;
+      if (error || !data) return [];
+      return data;
+    },
+    async crearTramo(proveedorId, umbral, pct) {
+      if (!sb) return { ok: false, error: 'Servicio no disponible.' };
+      const { error } = await sb.from('supplier_discount_tiers')
+        .insert({ proveedor_id: proveedorId, umbral_eur: umbral, descuento_pct: pct });
+      return error ? { ok: false, error: error.message } : { ok: true };
+    },
+    async eliminarTramo(id) {
+      if (!sb) return { ok: false, error: 'Servicio no disponible.' };
+      const { error } = await sb.from('supplier_discount_tiers').delete().eq('id', id);
+      return error ? { ok: false, error: error.message } : { ok: true };
+    },
+
     /* Cambia el estado de un pedido y registra el evento de seguimiento. */
     async updateOrderStatus(orderId, estado, descripcion) {
       if (!sb) return { ok: false, error: 'Servicio no disponible.' };

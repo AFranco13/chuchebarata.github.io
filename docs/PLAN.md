@@ -51,9 +51,12 @@ Estado: marca cada casilla al completarla.
 
 ## FASE 5 — Compras a proveedor (descuentos + coste medio WAC)
 
-- [ ] 🤖 Tablas `purchase_orders`, `purchase_order_items`, `supplier_discount_tiers`
-- [ ] 🤖 RPC `recibir_pedido_compra`: descuento por umbral + portes + recálculo WAC + movimiento `reposicion`
-- [ ] 🤖 Admin: crear/recibir pedidos de compra y ver coste medio
+- [x] 🤖 SQL `db/inventario-8.sql`: tablas `purchase_orders`, `purchase_order_items`, `supplier_discount_tiers` + RLS
+- [x] 🤖 RPC `recibir_pedido_compra`: descuento por umbral + portes prorrateados + recálculo WAC + movimiento `reposicion`
+- [x] 🤖 RPCs `crear_pedido_compra`, `cancelar_pedido_compra`, `descuento_proveedor` + vista `vista_compras`
+- [x] 🤖 Admin: pestaña **Compras** (crear borrador con líneas y descuento en vivo, recibir mercancía, tramos por proveedor)
+- [x] 🤖 `precio_coste` ampliado a `numeric(10,4)` para no perder precisión en el WAC
+- [ ] 🧑 Ejecutar `db/inventario-8.sql` en Supabase
 - [ ] 🧑 Cargar reglas de descuento de proveedores + probar recepción
 
 ---
@@ -80,4 +83,4 @@ Estado: marca cada casilla al completarla.
 - `ARQUITECTURA.md` — visión global del e-commerce
 - `INVENTARIO.md` — diseño de inventario, proveedores, compras y WAC
 - `PAGOS-STRIPE.md` — configuración de la pasarela de pago
-- `db/supabase-schema.sql` · `db/supabase-admin.sql` · `db/supabase-pagos.sql` · `db/inventario-1.sql`…`db/inventario-7.sql` — SQL a ejecutar en Supabase
+- `db/supabase-schema.sql` · `db/supabase-admin.sql` · `db/supabase-pagos.sql` · `db/inventario-1.sql`…`db/inventario-8.sql` — SQL a ejecutar en Supabase

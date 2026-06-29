@@ -73,7 +73,20 @@
   }
 
   /* ===================== PRODUCTOS ===================== */
-  let inventario = [], filtroProv = 'todos', mostrarAlta = false;
+  let inventario = [], filtroProv = 'todos', mostrarAlta = false, buscarProd = '';
+
+  // Muestra/oculta filas según el texto del buscador (sin re-renderizar).
+  function aplicarBusqueda() {
+    const q = buscarProd.trim().toLowerCase();
+    let visibles = 0;
+    document.querySelectorAll('.inv-row').forEach(r => {
+      const ok = !q || r.textContent.toLowerCase().includes(q);
+      r.style.display = ok ? '' : 'none';
+      if (ok) visibles++;
+    });
+    const aviso = document.getElementById('invSinResultados');
+    if (aviso) aviso.style.display = (q && visibles === 0) ? '' : 'none';
+  }
   async function cargarInventario() {
     if (!inventario.length) inventario = await Auth.getInventario();
     return inventario;
@@ -108,6 +121,7 @@
     cont.innerHTML = `
       <div class="admin-toolbar">
         <div class="admin-filters">
+          <input id="prodSearch" class="inv-search" type="search" placeholder="Buscar producto…" value="${esc(buscarProd)}" aria-label="Buscar producto">
           <label class="inv-filter">Proveedor:
             <select id="provFilter">
               <option value="todos"${filtroProv==='todos'?' selected':''}>Todos (${inventario.length})</option>
@@ -135,7 +149,9 @@
             </tr>`;
           }).join('')}
         </tbody>
-      </table></div>`;
+      </table></div>
+      <p id="invSinResultados" class="empty-state" style="display:none">Sin productos que coincidan con la búsqueda.</p>`;
+    aplicarBusqueda();
   }
 
   /* ===================== PROVEEDORES ===================== */
@@ -214,6 +230,10 @@
 
   document.addEventListener('change', e => {
     if (e.target.id === 'provFilter') { filtroProv = e.target.value; renderProductos(); }
+  });
+
+  document.addEventListener('input', e => {
+    if (e.target.id === 'prodSearch') { buscarProd = e.target.value; aplicarBusqueda(); }
   });
 
   // arranque

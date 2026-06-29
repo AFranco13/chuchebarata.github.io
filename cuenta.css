@@ -7,7 +7,10 @@
 
 /* ===================== BANNER DE COOKIES ===================== */
 .cc-banner{
-  position:fixed;left:0;right:0;bottom:0;z-index:200;
+  /* Por encima del contenido y la cabecera (50), pero por debajo del scrim
+     (60) y del carrito/menús (70) para no tapar sus botones de acción.
+     El panel de ajustes (.cc-overlay, 210) sí queda por encima de todo. */
+  position:fixed;left:0;right:0;bottom:0;z-index:55;
   background:#fff;border-top:1px solid var(--line);
   box-shadow:0 -18px 40px -30px rgba(42,26,36,.5);
   transform:translateY(110%);transition:transform .35s var(--ease);

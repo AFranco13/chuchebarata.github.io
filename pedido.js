@@ -63,6 +63,9 @@
     .filter(Boolean).map(esc).join('<br>') || 'No se indicó dirección.';
 
   const pagoOk = new URLSearchParams(location.search).get('pago') === 'ok';
+  // El pago se ha completado: vacía el carrito (se conservaba por si el
+  // cliente cancelaba en Stripe y quería recuperarlo).
+  if (pagoOk) { try { sessionStorage.removeItem('kq_cart'); } catch {} }
   const avisoPago = pagoOk
     ? `<div class="form-msg ok show" style="margin-bottom:18px">¡Pago recibido! Tu pedido está confirmado. Te avisaremos cuando salga.</div>`
     : '';

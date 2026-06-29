@@ -59,6 +59,15 @@ Deno.serve(async (req) => {
     if (order.user_id !== user.id) return json({ error: 'No autorizado' }, 403);
     if (order.estado !== 'pendiente') return json({ error: 'El pedido ya está pagado' }, 400);
 
+    // Blindaje: no se inicia el pago sin dirección de envío completa.
+    const dir = order.direccion || {};
+    const dirCompleta = ['linea1', 'cp', 'ciudad', 'provincia']
+      .every((k) => ((dir as any)[k] || '').toString().trim());
+    if (!dirCompleta) {
+      console.log('crear-sesion-pago · dirección incompleta para pedido', orderId);
+      return json({ error: 'Falta la dirección de envío. Complétala en tu perfil antes de pagar.' }, 400);
+    }
+
     const line_items = (order.order_items || []).map((i: any) => ({
       quantity: i.cantidad,
       price_data: {

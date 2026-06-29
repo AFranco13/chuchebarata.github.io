@@ -366,6 +366,12 @@ document.addEventListener('DOMContentLoaded', () => {
             full.forEach(x => PRODUCTOS_DATA.push(x));
           }
           // Portada curada: solo precio/stock en vivo sobre los destacados.
+          // Firma del estado visible antes y después para repintar SOLO si
+          // algo cambió (precio, agotado o un alta/baja). Así, en el caso
+          // normal no se reconstruye la cuadrícula y las imágenes ya cargadas
+          // no parpadean.
+          const sig = () => PRODUCTS.map(p => p.id + ':' + p.price + ':' + (p.en_stock === false ? 0 : 1)).join('|');
+          const antes = sig();
           const byId = {};
           live.forEach(p => { byId[p.id] = p; });
           for(let i = PRODUCTS.length - 1; i >= 0; i--){
@@ -376,8 +382,10 @@ document.addEventListener('DOMContentLoaded', () => {
             PRODUCTS[i].en_stock = u.en_stock;
             if(u.precio_comp != null) PRODUCTS[i].precio_comp = u.precio_comp;
           }
-          if($('#productGrid')) refresh();
-          updateCart();
+          if(sig() !== antes){
+            if($('#productGrid')) refresh();
+            updateCart();
+          }
         }
       })
       .catch(() => {});

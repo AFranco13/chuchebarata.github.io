@@ -317,10 +317,9 @@ function bindEvents(){
       e.preventDefault();
       const cat = filter.dataset.filter;
       if(FULL_CATALOG){
-        // En el catálogo: filtra en la propia página.
+        // En el catálogo: filtra en la propia página, sin desplazar (la
+        // cuadrícula ya está visible justo debajo de los filtros).
         setCat(cat);
-        const grid = $('#productGrid');
-        if(grid) grid.scrollIntoView({behavior:'smooth', block:'start'});
       } else {
         // En la portada: abre el catálogo completo ya filtrado.
         location.href = 'catalogo.html?cat=' + encodeURIComponent(cat);

@@ -62,6 +62,7 @@
     <div class="cart-foot">
       <div class="cart-total"><span>Total · IVA incl.</span><b id="cartTotal">0,00 €</b></div>
       <button class="btn btn-primary btn-block" id="checkoutBtn">Tramitar pedido</button>
+      <button class="cart-clear" id="clearCartBtn" type="button">Vaciar carrito</button>
     </div>`;
   document.body.appendChild(aside);
 
@@ -88,6 +89,8 @@
     const cc = $('#cartCount');
     cc.textContent = count;
     cc.classList.toggle('show', count > 0);
+    const clearBtn = $('#clearCartBtn');
+    if(clearBtn) clearBtn.style.display = ids.length ? '' : 'none';
 
     let total = 0;
     const html = ids.map(id => {
@@ -123,6 +126,11 @@
   btn.addEventListener('click', openCart);
   $('#cartClose').addEventListener('click', closeCart);
   scrim.addEventListener('click', closeCart);
+  $('#clearCartBtn').addEventListener('click', () => {
+    if(!Object.keys(cart).length) return;
+    if(!confirm('¿Vaciar el carrito?')) return;
+    cart = {}; sessionStorage.removeItem('kq_cart'); updateCart();
+  });
   document.addEventListener('keydown', e => { if(e.key === 'Escape') closeCart(); });
   document.addEventListener('click', e => {
     const q = e.target.closest('[data-q]');

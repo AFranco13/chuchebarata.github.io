@@ -159,6 +159,12 @@
 .badge.verde{background:#E7F2EC;color:#2C6B4A}
 .badge.rojo{background:#FCEBEF;color:#8A1538}
 
+/* Botón "Vaciar carrito" (secundario, dentro del carrito). */
+.cart-clear{display:block;width:100%;margin-top:10px;background:none;border:none;
+  color:var(--muted);font-family:var(--sans);font-size:.88rem;font-weight:600;
+  cursor:pointer;padding:8px;border-radius:var(--r-sm);transition:color .15s,background .15s}
+.cart-clear:hover{color:#8A1538;background:#FCEBEF}
+
 /* Botones deshabilitados (p. ej. "Agotado" o "Guardando…"). */
 .btn:disabled,.btn[disabled]{opacity:.5;cursor:not-allowed}
 .btn:disabled:hover,.btn[disabled]:hover{transform:none;background:var(--wine)}

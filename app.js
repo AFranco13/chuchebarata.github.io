@@ -209,6 +209,8 @@ function updateCart(){
   const cc = $('#cartCount');
   cc.textContent = count;
   cc.classList.toggle('show', count > 0);
+  const clearBtn = $('#clearCartBtn');
+  if(clearBtn) clearBtn.style.display = ids.length ? '' : 'none';
 
   let total = 0;
   const html = ids.map(id => {
@@ -299,6 +301,12 @@ function bindEvents(){
     if(res.reason === 'auth' || res.reason === 'redirect' || res.reason === 'address') return;   // navegando a login/Stripe/perfil
     if(res.ok){ cart = {}; sessionStorage.removeItem('kq_cart'); updateCart(); closeCart(); location.href = 'pedido.html?id=' + res.id; return; }
     if(res.error){ showToast(res.error); }
+  });
+
+  if($('#clearCartBtn')) $('#clearCartBtn').addEventListener('click', () => {
+    if(!Object.keys(cart).length) return;
+    if(!confirm('¿Vaciar el carrito?')) return;
+    cart = {}; sessionStorage.removeItem('kq_cart'); updateCart();
   });
 
   $('#searchBtn').addEventListener('click', () => {

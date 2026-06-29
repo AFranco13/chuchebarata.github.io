@@ -53,6 +53,8 @@ function updateCart() {
   const count = ids.reduce((s, id) => s + cart[id], 0);
   const cc = $('#cartCount');
   if (cc) { cc.textContent = count; cc.classList.toggle('show', count > 0); }
+  const clearBtn = $('#clearCartBtn');
+  if (clearBtn) clearBtn.style.display = ids.length ? '' : 'none';
 
   let total = 0;
   const html = ids.map(id => {
@@ -210,6 +212,11 @@ document.addEventListener('DOMContentLoaded', () => {
   $('#cartBtn').addEventListener('click', openCart);
   $('#cartClose').addEventListener('click', closeCart);
   $('#scrim').addEventListener('click', closeCart);
+  if ($('#clearCartBtn')) $('#clearCartBtn').addEventListener('click', () => {
+    if (!Object.keys(cart).length) return;
+    if (!confirm('¿Vaciar el carrito?')) return;
+    cart = {}; sessionStorage.removeItem('kq_cart'); updateCart();
+  });
   $('#checkoutBtn').addEventListener('click', async () => {
     const res = await Checkout.tramitar({
       cart,

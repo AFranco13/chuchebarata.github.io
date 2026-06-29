@@ -56,7 +56,8 @@ begin
 
   v_envio := case when v_subtotal >= ENVIO_GRATIS then 0 else TARIFA_ENVIO end;
   v_total := v_subtotal + v_envio;
-  update public.orders set subtotal = v_subtotal, envio = v_envio, total = v_total where id = v_id;
+  update public.orders set subtotal = v_subtotal, envio = v_envio, total = v_total
+   where orders.id = v_id;
 
   v_desc := case when p_estado = 'pendiente'
       then 'Hemos registrado tu pedido. Falta completar el pago.'

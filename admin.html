@@ -44,15 +44,16 @@
     <div class="profile-head">
       <span class="account-avatar" style="background:var(--caramel)">★</span>
       <div>
-        <h1>Pedidos</h1>
-        <p id="adminSub">Gestiona los pedidos y su estado de envío.</p>
+        <h1>Administración</h1>
+        <p id="adminSub">Panel de gestión de la tienda.</p>
       </div>
     </div>
 
-    <div class="admin-toolbar" id="adminToolbar" style="display:none">
-      <div class="admin-filters" id="adminFilters"></div>
-      <button class="btn btn-ghost" id="refreshBtn" type="button">Actualizar</button>
-    </div>
+    <nav class="profile-tabs" id="adminTabs" aria-label="Secciones de administración" style="display:none">
+      <button class="active" data-tab="pedidos" type="button">Pedidos</button>
+      <button data-tab="productos" type="button">Productos</button>
+      <button data-tab="proveedores" type="button">Proveedores</button>
+    </nav>
 
     <div id="adminContent">
       <p style="color:var(--muted)">Comprobando permisos…</p>

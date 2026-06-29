@@ -236,9 +236,8 @@
     async getProductos() {
       if (!sb) return [];
       const { data, error } = await sb
-        .from('products')
-        .select('id, nombre, categoria, cat_label, slug, img, precio, precio_comp, stock, activo')
-        .eq('activo', true);
+        .from('catalogo_publico')
+        .select('id, nombre, categoria, cat_label, slug, img, precio, precio_comp, stock');
       if (error || !data) return [];
       return data.map(p => ({
         id: p.id, nombre: p.nombre, cat: p.categoria, cat_label: p.cat_label,
@@ -250,8 +249,8 @@
 
     async getProducto(id) {
       if (!sb) return null;
-      const { data } = await sb.from('products')
-        .select('id, nombre, categoria, cat_label, slug, img, precio, precio_comp, stock, activo')
+      const { data } = await sb.from('catalogo_publico')
+        .select('id, nombre, categoria, cat_label, slug, img, precio, precio_comp, stock')
         .eq('id', id).maybeSingle();
       if (!data) return null;
       return {
@@ -294,6 +293,33 @@
         .order('created_at', { ascending: false });
       if (error || !data) return [];
       return data.map(normalizeOrder);
+    },
+
+    /* ---------- inventario (admin) ---------- */
+    /* Todos los productos con coste, proveedor y margen (vista_inventario). */
+    async getInventario() {
+      if (!sb) return [];
+      const { data, error } = await sb.from('vista_inventario').select('*').order('nombre');
+      if (error || !data) return [];
+      return data;
+    },
+
+    async crearProducto(prod) {
+      if (!sb) return { ok: false, error: 'Servicio no disponible.' };
+      const { data, error } = await sb.rpc('crear_producto', { p: prod });
+      return error ? { ok: false, error: error.message } : { ok: true, id: data };
+    },
+
+    async actualizarProducto(id, cambios) {
+      if (!sb) return { ok: false, error: 'Servicio no disponible.' };
+      const { error } = await sb.rpc('actualizar_producto', { p_id: id, p_cambios: cambios });
+      return error ? { ok: false, error: error.message } : { ok: true };
+    },
+
+    async ajustarStock(id, delta, motivo) {
+      if (!sb) return { ok: false, error: 'Servicio no disponible.' };
+      const { error } = await sb.rpc('ajustar_stock', { p_id: id, p_delta: delta, p_motivo: motivo || 'ajuste' });
+      return error ? { ok: false, error: error.message } : { ok: true };
     },
 
     /* Cambia el estado de un pedido y registra el evento de seguimiento. */

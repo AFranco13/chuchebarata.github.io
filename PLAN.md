@@ -20,12 +20,13 @@ Estado: marca cada casilla al completarla.
 
 ## FASE 2 — Panel de administración de productos y proveedores
 
-- [ ] 🤖 RPC `crear_producto`, `actualizar_producto`, `ajustar_stock(id, delta, motivo)` (solo admin)
-- [ ] 🤖 `admin.html`/`admin.js`: pestaña **Productos** (listado, alta, edición de precio/stock, activar/desactivar)
-- [ ] 🤖 Filtro por proveedor + columna de proveedor en el listado
-- [ ] 🤖 Vista **"Proveedores"** (nº productos, valor stock, plazo) → sus productos
-- [ ] 🤖 Ficha de producto admin: proveedor, referencia, coste, margen, enlace de reposición
-- [ ] 🧑 Ejecutar SQL y probar
+- [x] 🤖 RPC `crear_producto`, `actualizar_producto`, `ajustar_stock` + seguridad (`inventario-3.sql`: vista pública `catalogo_publico`, tabla solo-admin)
+- [x] 🤖 `admin.html`/`admin.js`: pestaña **Productos** (listado, alta, edición de precio/stock, activar/desactivar)
+- [x] 🤖 Filtro por proveedor + columna de proveedor en el listado
+- [x] 🤖 Vista **"Proveedores"** (nº productos, valor stock, plazo) → sus productos
+- [x] 🤖 Coste y margen por producto en el listado admin
+- [ ] 🧑 Ejecutar `inventario-3.sql` y probar
+- [ ] 🤖 *(siguiente)* que los productos nuevos del admin aparezcan en la tienda (escaparate desde la BD)
 
 ---
 

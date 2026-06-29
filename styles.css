@@ -85,7 +85,7 @@ h1,h2,h3,h4{font-family:var(--display);font-weight:600;line-height:1.08;letter-s
 header{position:sticky;top:0;z-index:50;background:rgba(251,244,239,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 .header-in{display:flex;align-items:center;gap:28px;height:74px}
 .brand{display:flex;align-items:center;gap:11px;color:var(--wine)}
-.brand-mark{width:34px;height:34px;flex-shrink:0}
+.brand-mark{width:34px;height:34px;flex-shrink:0;object-fit:contain}
 .brand-name{font-family:var(--display);font-weight:700;font-size:1.22rem;letter-spacing:-.02em;color:var(--ink)}
 .nav{display:flex;gap:30px;margin-left:14px;flex:1}
 .nav a{font-weight:600;font-size:.95rem;color:var(--muted);position:relative;padding:4px 0;transition:color .18s}
@@ -225,7 +225,7 @@ header{position:sticky;top:0;z-index:50;background:rgba(251,244,239,.85);backdro
 footer{background:var(--ink);color:#D9CBD2;padding:60px 0 28px;margin-top:40px}
 .footer-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:36px}
 footer .brand-name,footer .brand{color:#fff}
-footer .brand-mark{color:#E8B98A}
+footer .brand-mark{border-radius:6px}
 .footer-brand p{color:#9D8C96;font-size:.92rem;max-width:32ch;margin:16px 0 18px}
 .socials{display:flex;gap:10px}
 .socials a{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.08);display:grid;place-items:center;transition:background .18s,transform .18s}

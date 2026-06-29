@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catálogo completo · El Kiosquillo</title>
+<meta name="description" content="Todo el catálogo de chuches de El Kiosquillo: gominolas, regaliz, chocolate, nubes, caramelos, chicles y más. Filtra por categoría y añade al carrito.">
+<link rel="canonical" href="https://chuchebarata.com/catalogo.html">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#6E1A3C">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="cuenta.css">
+</head>
+<body data-catalogo>
+
+<div class="utility">
+  <div class="container utility-in">
+    <span>Envío en 24-48 h · Gratis a partir de 49&nbsp;€</span>
+    <span class="utility-right">Atención por WhatsApp · Lun&nbsp;a&nbsp;Sáb</span>
+  </div>
+</div>
+
+<header id="top">
+  <div class="container header-in">
+    <a href="index.html" class="brand" aria-label="El Kiosquillo, inicio">
+      <img src="images/Logo-sin-texto.png" class="brand-mark" alt="El Kiosquillo" aria-hidden="true">
+      <span class="brand-name">El Kiosquillo</span>
+    </a>
+
+    <nav class="nav" aria-label="Principal">
+      <a href="index.html#categorias">Catálogo</a>
+      <a href="catalogo.html" aria-current="page">Chuches</a>
+      <a href="caja.html">Crea tu caja</a>
+      <a href="index.html#eventos">Fiestas y eventos</a>
+      <a href="index.html#valores">Sobre nosotros</a>
+    </nav>
+
+    <div class="header-tools">
+      <button class="tool" id="searchBtn" aria-label="Buscar">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><line x1="16.5" y1="16.5" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <button class="tool cart-toggle" id="cartBtn" aria-label="Abrir carrito">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14l-1.2 10.5a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8L5 7Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 7a3 3 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+        <span class="cart-count" id="cartCount">0</span>
+      </button>
+      <button class="tool menu-toggle" id="menuBtn" aria-label="Menú">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="4" y1="8" x2="20" y2="8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="4" y1="16" x2="20" y2="16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="searchwrap" id="searchWrap">
+    <div class="container">
+      <input type="text" id="searchInput" placeholder="Buscar en el catálogo: gominolas, regaliz, chocolate…" autocomplete="off">
+    </div>
+  </div>
+</header>
+
+<nav class="mobile-nav" id="mobileNav" aria-label="Menú móvil">
+  <a href="index.html#categorias">Catálogo</a>
+  <a href="catalogo.html">Chuches</a>
+  <a href="caja.html">Crea tu caja</a>
+  <a href="index.html#eventos">Fiestas y eventos</a>
+  <a href="index.html#valores">Sobre nosotros</a>
+</nav>
+
+<main>
+  <section class="section catalogo-section">
+    <div class="container">
+      <div class="section-head reveal">
+        <div>
+          <p class="kicker">La tienda</p>
+          <h1>Catálogo completo</h1>
+        </div>
+        <p class="section-sub" id="resultNote">Todas nuestras chuches.</p>
+      </div>
+      <div class="filters reveal" id="filters"></div>
+      <div class="product-grid" id="productGrid"></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <a href="index.html" class="brand">
+        <img src="images/Logo-sin-texto.png" class="brand-mark" alt="El Kiosquillo" aria-hidden="true">
+        <span class="brand-name">El Kiosquillo</span>
+      </a>
+      <p>El Kiosquillo (chuchebarata.com) es la tienda online de chuches baratas con el mayor surtido. Más de 200 referencias de los mejores proveedores.</p>
+      <div class="socials">
+        <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor"/></svg></a>
+        <a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M14 8h2.5V5H14c-2 0-3.5 1.5-3.5 3.5V10H8v3h2.5v8h3v-8H16l.5-3h-3V8.7c0-.4.3-.7.7-.7Z" fill="currentColor"/></svg></a>
+        <a href="#" aria-label="WhatsApp"><svg viewBox="0 0 24 24"><path d="M4 20l1.3-4A8 8 0 1 1 8 18.7L4 20Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></a>
+      </div>
+    </div>
+    <nav class="footer-col" aria-label="Tienda">
+      <h4>Tienda</h4>
+      <a href="catalogo.html?cat=gominolas">Gominolas</a>
+      <a href="catalogo.html?cat=chocolate">Chocolate</a>
+      <a href="catalogo.html?cat=regaliz">Regaliz</a>
+      <a href="index.html#eventos">Packs de fiesta</a>
+      <a href="catalogo.html">Todas las categorías</a>
+    </nav>
+    <nav class="footer-col" aria-label="Ayuda">
+      <h4>Ayuda</h4>
+      <a href="#">Envíos y entregas</a>
+      <a href="#">Devoluciones</a>
+      <a href="#">Pago seguro</a>
+      <a href="#">Contacto</a>
+    </nav>
+    <nav class="footer-col" aria-label="Información">
+      <h4>Información</h4>
+      <a href="index.html#valores">Sobre nosotros</a>
+      <a href="aviso-legal.html">Aviso legal</a>
+      <a href="privacidad.html">Política de privacidad</a>
+      <a href="terminos.html">Términos y condiciones</a>
+      <a href="cookies.html">Política de cookies</a>
+      <a href="#" onclick="abrirPanelCookies();return false;">Gestionar cookies</a>
+    </nav>
+  </div>
+  <div class="container footer-bottom">
+    <span>© 2026 El Kiosquillo · chuchebarata.com</span>
+    <span>Diseño y desarrollo propio</span>
+  </div>
+</footer>
+
+<!-- CART -->
+<div class="scrim" id="scrim"></div>
+<aside class="cart" id="cart" aria-label="Carrito de compra">
+  <div class="cart-head">
+    <h3>Tu pedido</h3>
+    <button class="cart-close" id="cartClose" aria-label="Cerrar">
+      <svg viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="ship">
+    <p id="shipMsg"></p>
+    <div class="ship-track"><div class="ship-fill" id="shipFill"></div></div>
+  </div>
+  <div class="cart-items" id="cartItems"></div>
+  <div class="cart-foot">
+    <div class="cart-total"><span>Total · IVA incl.</span><b id="cartTotal">0,00 €</b></div>
+    <button class="btn btn-primary btn-block" id="checkoutBtn">Tramitar pedido</button>
+    <button class="cart-clear" id="clearCartBtn" type="button">Vaciar carrito</button>
+  </div>
+</aside>
+
+<div class="toast" id="toast"><span id="toastMsg"></span></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="auth.js"></script>
+<script src="checkout.js"></script>
+<script src="sesion.js"></script>
+<script src="cookies-consent.js"></script>
+<script src="productos_data.js"></script>
+<script src="app.js" defer></script>
+</body>
+</html>

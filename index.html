@@ -69,7 +69,7 @@
 
     <nav class="nav" aria-label="Principal">
       <a href="#categorias">Catálogo</a>
-      <a href="#tienda">Chuches</a>
+      <a href="catalogo.html" target="_blank" rel="noopener">Chuches</a>
       <a href="caja.html">Crea tu caja</a>
       <a href="#eventos">Fiestas y eventos</a>
       <a href="#valores">Sobre nosotros</a>
@@ -97,7 +97,7 @@
 
 <nav class="mobile-nav" id="mobileNav" aria-label="Menú móvil">
   <a href="#categorias">Catálogo</a>
-  <a href="#tienda">Chuches</a>
+  <a href="catalogo.html" target="_blank" rel="noopener">Chuches</a>
   <a href="caja.html">Crea tu caja</a>
   <a href="#eventos">Fiestas y eventos</a>
   <a href="#valores">Sobre nosotros</a>
@@ -111,7 +111,7 @@
       <h1>Las chuches más baratas, <span class="ital">miles de sabores</span>.</h1>
       <p class="lead">Gominolas, regaliz, nubes, chocolate y mucho más de los mejores proveedores. Amplio surtido, precios imbatibles y sin mínimo de pedido.</p>
       <div class="hero-cta">
-        <a href="#tienda" class="btn btn-primary">Ver el catálogo</a>
+        <a href="catalogo.html" class="btn btn-primary">Ver el catálogo</a>
         <a href="#eventos" class="btn btn-ghost">Packs para fiestas</a>
       </div>
       <div class="hero-proof">
@@ -235,12 +235,14 @@
     <div class="section-head reveal">
       <div>
         <p class="kicker">La tienda</p>
-        <h2>Selección de temporada</h2>
+        <h2>Lo más vendido</h2>
       </div>
-      <p class="section-sub" id="resultNote">Lo más vendido esta semana.</p>
+      <p class="section-sub" id="resultNote">Nuestras chuches más populares.</p>
     </div>
-    <div class="filters reveal" id="filters"></div>
     <div class="product-grid" id="productGrid"></div>
+    <div class="more-wrap reveal">
+      <a class="btn btn-primary" id="showMore" href="catalogo.html">Mostrar más</a>
+    </div>
   </div>
 </section>
 
@@ -318,11 +320,11 @@
     </div>
     <nav class="footer-col" aria-label="Tienda">
       <h4>Tienda</h4>
-      <a href="#tienda">Gominolas</a>
-      <a href="#tienda">Chocolate</a>
-      <a href="#tienda">Regaliz</a>
+      <a href="catalogo.html?cat=gominolas">Gominolas</a>
+      <a href="catalogo.html?cat=chocolate">Chocolate</a>
+      <a href="catalogo.html?cat=regaliz">Regaliz</a>
       <a href="#eventos">Packs de fiesta</a>
-      <a href="#categorias">Todas las categorías</a>
+      <a href="catalogo.html">Todas las categorías</a>
     </nav>
     <nav class="footer-col" aria-label="Ayuda">
       <h4>Ayuda</h4>

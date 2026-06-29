@@ -91,6 +91,13 @@ const eur = n => n.toFixed(2).replace('.', ',') + ' €';
 let cart = (() => { try { return JSON.parse(sessionStorage.getItem('kq_cart')) || {}; } catch { return {}; } })();
 let activeCat = 'todo';
 
+/* Lista que alimenta el grid: en la portada es la selección curada
+   (PRODUCTS); en catalogo.html es el catálogo completo (PRODUCTOS_DATA).
+   FULL_CATALOG marca la página de catálogo. */
+let CATALOG = PRODUCTS;
+let FULL_CATALOG = false;
+const HOME_LIMIT = 8;   // nº de productos en el bloque "Lo más vendido" de la portada
+
 /* Datos normalizados de un producto del carrito, buscando primero en el
    catálogo de portada (PRODUCTS) y, si no, en el completo (PRODUCTOS_DATA). */
 function cartItemData(id){
@@ -117,7 +124,7 @@ function renderCategories(){
 function renderFilters(){
   const cats = [{id:'todo',name:'Todo'}, ...CATEGORIES.filter(c=>c.id!=='decoracion')];
   $('#filters').innerHTML = cats.map(c =>
-    `<button class="filter${c.id==='todo'?' active':''}" data-filter="${c.id}">${c.name}</button>`).join('');
+    `<button class="filter${c.id===activeCat?' active':''}" data-filter="${c.id}">${c.name}</button>`).join('');
 }
 
 /* ---- productos ---- */
@@ -128,38 +135,64 @@ function renderProducts(list){
     grid.innerHTML = `<div class="empty-grid"><b>Sin resultados</b>Prueba con otra familia o término de búsqueda.</div>`;
     return;
   }
-  grid.innerHTML = list.map(p => `
+  grid.innerHTML = list.map(p => {
+    // PRODUCTS usa name + meta corta; PRODUCTOS_DATA usa nombre + cat_label/marca
+    // (su "meta" es una descripción larga). Normalizamos para ambos formatos.
+    const name = p.name || p.nombre || 'Producto';
+    const meta = p.cat_label
+      ? [p.cat_label, p.marca].filter(Boolean).join(' · ')
+      : (p.meta || '');
+    return `
     <article class="product">
       ${p.tag ? `<span class="product-tag ${p.tag}">${p.tag==='oferta'?'Oferta':p.tag==='nuevo'?'Novedad':'Más vendido'}</span>`:''}
-      <a href="producto.html?id=${p.id}" class="product-link" aria-label="Ver detalle de ${p.name}">
-        <div class="product-thumb" style="background:${TINTS[p.cat]}">${p.img ? `<img src="${p.img}" alt="${p.name}" loading="lazy">` : ART[p.art]}</div>
+      <a href="producto.html?id=${p.id}" class="product-link" aria-label="Ver detalle de ${name}">
+        <div class="product-thumb" style="background:${TINTS[p.cat]}">${p.img ? `<img src="${p.img}" alt="${name}" loading="lazy">` : ART[p.art]}</div>
       </a>
       <div class="product-body">
-        <h3><a href="producto.html?id=${p.id}" class="product-name-link">${p.name}</a></h3>
-        <p class="meta">${p.meta}</p>
+        <h3><a href="producto.html?id=${p.id}" class="product-name-link">${name}</a></h3>
+        <p class="meta">${meta}</p>
         ${p.allergen ? `<span class="allergen">● Sin gluten</span>` : ''}
         <div class="product-foot">
           <span class="price ${p.old?'sale':''}">${p.old?`<s>${eur(p.old)}</s>`:''}${eur(p.price)}</span>
           ${p.en_stock === false
             ? `<span class="agotado-tag">Agotado</span>`
-            : `<button class="add" data-add="${p.id}" aria-label="Añadir ${p.name}">${plusIcon}</button>`}
+            : `<button class="add" data-add="${p.id}" aria-label="Añadir ${name}">${plusIcon}</button>`}
         </div>
       </div>
-    </article>`).join('');
+    </article>`;
+  }).join('');
 }
 
 function currentList(){
-  let list = PRODUCTS;
+  let list = CATALOG;
   const q = ($('#searchInput') ? $('#searchInput').value.trim() : '').toLowerCase();
   if(activeCat !== 'todo') list = list.filter(p => p.cat === activeCat);
-  if(q) list = list.filter(p => (p.name+' '+p.meta+' '+p.cat).toLowerCase().includes(q));
+  if(q) list = list.filter(p => ((p.name||p.nombre||'')+' '+(p.cat_label||p.meta||'')+' '+(p.cat||'')+' '+(p.marca||'')).toLowerCase().includes(q));
   const note = $('#resultNote');
-  if(q) note.textContent = `${list.length} resultado${list.length!==1?'s':''} para «${$('#searchInput').value.trim()}».`;
-  else if(activeCat==='todo') note.textContent = 'Lo más vendido esta semana.';
-  else note.textContent = `${list.length} referencia${list.length!==1?'s':''} en esta familia.`;
+  if(note){
+    if(q) note.textContent = `${list.length} resultado${list.length!==1?'s':''} para «${$('#searchInput').value.trim()}».`;
+    else if(activeCat==='todo') note.textContent = FULL_CATALOG
+      ? `Todo el catálogo · ${list.length} producto${list.length!==1?'s':''}.`
+      : 'Lo más vendido esta semana.';
+    else note.textContent = `${list.length} referencia${list.length!==1?'s':''} en esta familia.`;
+  }
   return list;
 }
-function refresh(){ renderProducts(currentList()); }
+function refresh(){
+  let list = currentList();
+  const moreBtn = $('#showMore');
+  // En la portada ("Lo más vendido") se muestra solo un adelanto; al buscar
+  // o filtrar se muestran todos los resultados y se oculta "Mostrar más".
+  const buscando = !!((($('#searchInput') && $('#searchInput').value.trim())) || activeCat !== 'todo');
+  if (!FULL_CATALOG && !buscando && list.length > HOME_LIMIT) {
+    list = [...list].sort((a,b) => (b.tag==='top'?1:0) - (a.tag==='top'?1:0)).slice(0, HOME_LIMIT);
+    renderProducts(list);
+    if (moreBtn) moreBtn.hidden = false;
+  } else {
+    renderProducts(list);
+    if (moreBtn) moreBtn.hidden = true;
+  }
+}
 
 function setCat(cat){
   activeCat = cat;
@@ -282,9 +315,16 @@ function bindEvents(){
     const filter = e.target.closest('[data-filter]');
     if(filter){
       e.preventDefault();
-      setCat(filter.dataset.filter);
-      const tienda = $('#tienda');
-      if(tienda) tienda.scrollIntoView({behavior:'smooth'});
+      const cat = filter.dataset.filter;
+      if(FULL_CATALOG){
+        // En el catálogo: filtra en la propia página.
+        setCat(cat);
+        const grid = $('#productGrid');
+        if(grid) grid.scrollIntoView({behavior:'smooth', block:'start'});
+      } else {
+        // En la portada: abre el catálogo completo ya filtrado.
+        location.href = 'catalogo.html?cat=' + encodeURIComponent(cat);
+      }
       return;
     }
   });
@@ -340,6 +380,17 @@ function bindEvents(){
 
 /* ---- init ---- */
 document.addEventListener('DOMContentLoaded', () => {
+  // Página de catálogo completo: usa PRODUCTOS_DATA y admite ?cat= / ?q=.
+  FULL_CATALOG = document.body.hasAttribute('data-catalogo');
+  if (FULL_CATALOG && typeof PRODUCTOS_DATA !== 'undefined' && Array.isArray(PRODUCTOS_DATA)) {
+    CATALOG = PRODUCTOS_DATA;
+    const params = new URLSearchParams(location.search);
+    const cat = params.get('cat');
+    const q = params.get('q');
+    if (cat) activeCat = cat;
+    if (q && $('#searchInput')) $('#searchInput').value = q;
+  }
+
   if ($('#catGrid'))     renderCategories();
   if ($('#filters'))    renderFilters();
   if ($('#eventCards')) renderEvents();
@@ -364,6 +415,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const full = Auth.fusionarCatalogo(live, PRODUCTOS_DATA);
             PRODUCTOS_DATA.length = 0;
             full.forEach(x => PRODUCTOS_DATA.push(x));
+          }
+          // En la página de catálogo completo se repinta directamente con el
+          // catálogo en vivo (CATALOG apunta a PRODUCTOS_DATA, ya reconstruido).
+          if(FULL_CATALOG){
+            if($('#productGrid')) refresh();
+            updateCart();
+            return;
           }
           // Portada curada: solo precio/stock en vivo sobre los destacados.
           // Firma del estado visible antes y después para repintar SOLO si

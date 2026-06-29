@@ -165,6 +165,9 @@ header{position:sticky;top:38px;z-index:50;background:rgba(251,244,239,.85);back
 
 /* ---------- products ---------- */
 .product-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.more-wrap{display:flex;justify-content:center;margin-top:34px}
+#showMore[hidden]{display:none}
+.catalogo-section{padding-top:44px}
 .product{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column;position:relative;transition:transform .2s var(--ease),box-shadow .2s var(--ease)}
 .product:hover{transform:translateY(-5px);box-shadow:var(--shadow)}
 .product-thumb{aspect-ratio:1.12;display:grid;place-items:center;position:relative;overflow:hidden}

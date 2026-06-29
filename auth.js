@@ -230,6 +230,38 @@
       return data.map(normalizeOrder);
     },
 
+    /* ---------- catálogo (inventario en BD) ---------- */
+    /* Lee los productos activos desde Supabase. Devuelve [] si no se puede
+       (el frontend usará entonces el respaldo de productos_data.js). */
+    async getProductos() {
+      if (!sb) return [];
+      const { data, error } = await sb
+        .from('products')
+        .select('id, nombre, categoria, cat_label, slug, img, precio, precio_comp, stock, activo')
+        .eq('activo', true);
+      if (error || !data) return [];
+      return data.map(p => ({
+        id: p.id, nombre: p.nombre, cat: p.categoria, cat_label: p.cat_label,
+        slug: p.slug, img: p.img, price: Number(p.precio) || 0,
+        precio_comp: p.precio_comp != null ? Number(p.precio_comp) : null,
+        stock: p.stock, en_stock: (p.stock | 0) > 0,
+      }));
+    },
+
+    async getProducto(id) {
+      if (!sb) return null;
+      const { data } = await sb.from('products')
+        .select('id, nombre, categoria, cat_label, slug, img, precio, precio_comp, stock, activo')
+        .eq('id', id).maybeSingle();
+      if (!data) return null;
+      return {
+        id: data.id, nombre: data.nombre, cat: data.categoria, cat_label: data.cat_label,
+        slug: data.slug, img: data.img, price: Number(data.precio) || 0,
+        precio_comp: data.precio_comp != null ? Number(data.precio_comp) : null,
+        stock: data.stock, en_stock: (data.stock | 0) > 0,
+      };
+    },
+
     /* ---------- administración ---------- */
     /* Todos los pedidos (solo administradores; la RLS lo garantiza). */
     async getAllOrders() {

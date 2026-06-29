@@ -38,8 +38,8 @@ begin
     v_cant := greatest(coalesce(nullif(it->>'cantidad','')::int, 1), 1);
 
     -- Precio y datos DESDE la base de datos (blindaje).
-    select precio, nombre, img into v_precio, v_nombre, v_img
-      from public.products where id = v_pid;
+    select p.precio, p.nombre, p.img into v_precio, v_nombre, v_img
+      from public.products p where p.id = v_pid;
 
     -- Si el producto no está en la tabla, usa lo recibido (no romper).
     if v_precio is null then

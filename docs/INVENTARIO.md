@@ -50,6 +50,7 @@ erDiagram
     text sku
     text nombre
     text categoria
+    text marca
     numeric precio
     numeric precio_coste
     int stock
@@ -139,7 +140,13 @@ flowchart TB
 
 ---
 
-## 5. Proveedores y trazabilidad
+## 5. Marca vs. proveedor, y trazabilidad
+
+**Marca ≠ proveedor.** La **marca** (`products.marca`: Fini, Burmar, Damel…) es
+quién fabrica el producto; el **proveedor** (`proveedor_id`) es a quién se le
+compra (un distribuidor que vende muchas marcas). Hoy el único proveedor es
+**Lekkerland** (lekkerlandstore.com), de donde provienen todas las referencias
+(`ref_proveedor`) y enlaces (`url_proveedor`) del catálogo actual.
 
 Cada producto tiene un **proveedor principal** (`proveedor_id`) + su referencia
 (`ref_proveedor`) y enlace (`url_proveedor`). (Si se compra el mismo producto a

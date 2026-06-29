@@ -56,7 +56,9 @@ Estado: marca cada casilla al completarla.
 - [x] 🤖 RPCs `crear_pedido_compra`, `cancelar_pedido_compra`, `descuento_proveedor` + vista `vista_compras`
 - [x] 🤖 Admin: pestaña **Compras** (crear borrador con líneas y descuento en vivo, recibir mercancía, tramos por proveedor)
 - [x] 🤖 `precio_coste` ampliado a `numeric(10,4)` para no perder precisión en el WAC
-- [ ] 🧑 Ejecutar `db/inventario-8.sql` en Supabase
+- [x] 🤖 `db/inventario-9.sql`: separa **marca** (atributo del producto) de **proveedor**; crea el proveedor real "Lekkerland" y reapunta el catálogo
+- [x] 🤖 Admin: columna **Marca** editable/buscable en Productos y campo de marca en el alta
+- [ ] 🧑 Ejecutar `db/inventario-8.sql` y `db/inventario-9.sql` en Supabase
 - [ ] 🧑 Cargar reglas de descuento de proveedores + probar recepción
 
 ---
@@ -83,4 +85,4 @@ Estado: marca cada casilla al completarla.
 - `ARQUITECTURA.md` — visión global del e-commerce
 - `INVENTARIO.md` — diseño de inventario, proveedores, compras y WAC
 - `PAGOS-STRIPE.md` — configuración de la pasarela de pago
-- `db/supabase-schema.sql` · `db/supabase-admin.sql` · `db/supabase-pagos.sql` · `db/inventario-1.sql`…`db/inventario-8.sql` — SQL a ejecutar en Supabase
+- `db/supabase-schema.sql` · `db/supabase-admin.sql` · `db/supabase-pagos.sql` · `db/inventario-1.sql`…`db/inventario-9.sql` — SQL a ejecutar en Supabase

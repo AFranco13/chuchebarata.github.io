@@ -141,7 +141,8 @@
     const q = buscarProd.trim().toLowerCase();
     let visibles = 0;
     document.querySelectorAll('.inv-row').forEach(r => {
-      const ok = !q || r.textContent.toLowerCase().includes(q);
+      const txt = (r.textContent + ' ' + (r.dataset.marca || '')).toLowerCase();
+      const ok = !q || txt.includes(q);
       r.style.display = ok ? '' : 'none';
       if (ok) visibles++;
     });
@@ -170,6 +171,7 @@
     const filaAlta = mostrarAlta ? `
       <tr class="inv-alta">
         <td><input id="na-nombre" placeholder="Nombre"></td>
+        <td><input id="na-marca" placeholder="marca" style="width:90px"></td>
         <td><input id="na-cat" placeholder="categoría" style="width:90px"></td>
         <td><input id="na-stock" type="number" value="0" style="width:64px"></td>
         <td><input id="na-coste" type="number" step="0.01" placeholder="0,00" style="width:74px"></td>
@@ -193,13 +195,14 @@
         <button class="btn btn-ghost" id="nuevoProd" type="button">+ Nuevo producto</button>
       </div>
       <div class="inv-wrap"><table class="inv-table">
-        <thead><tr><th>Producto</th><th>Proveedor</th><th>Stock</th><th>Coste</th><th>Precio</th><th>Margen</th><th>Activo</th><th></th></tr></thead>
+        <thead><tr><th>Producto</th><th>Marca</th><th>Proveedor</th><th>Stock</th><th>Coste</th><th>Precio</th><th>Margen</th><th>Activo</th><th></th></tr></thead>
         <tbody>
           ${filaAlta}
           ${lista.map(p => {
             const bajo = p.stock <= (p.stock_minimo || 0);
-            return `<tr class="inv-row" data-id="${p.id}">
+            return `<tr class="inv-row" data-id="${p.id}" data-marca="${esc(p.marca||'')}">
               <td>${esc(p.nombre)}<small class="inv-sku">${esc(p.sku||'')}</small></td>
+              <td><input class="inv-in" data-f="marca" type="text" value="${esc(p.marca||'')}" style="width:100px" placeholder="—"></td>
               <td>${esc(p.proveedor || '—')}</td>
               <td><input class="inv-in" data-f="stock" type="number" value="${p.stock}" style="width:64px">${bajo?' <span class="inv-bajo" title="Stock bajo">⚠</span>':''}</td>
               <td><input class="inv-in" data-f="precio_coste" type="number" step="0.01" value="${Number(p.precio_coste).toFixed(2)}" style="width:74px"></td>
@@ -462,6 +465,7 @@
     if (e.target.id === 'naSave') {
       const res = await Auth.crearProducto({
         nombre: $('#na-nombre').value.trim(),
+        marca: $('#na-marca').value.trim(),
         categoria: $('#na-cat').value.trim(),
         stock: $('#na-stock').value, precio_coste: $('#na-coste').value, precio: $('#na-precio').value,
       });
@@ -495,7 +499,7 @@
       if (!res.ok) { alert('Error: ' + res.error); return; }
       inventario = []; await cargarInventario();
       const upd = inventario.find(p => p.id === id);
-      if (upd) { row.querySelector('td:nth-child(6)').textContent = eur(upd.margen_eur); }
+      if (upd) { row.querySelector('td:nth-child(7)').textContent = eur(upd.margen_eur); }
       return;
     }
 

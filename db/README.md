@@ -22,6 +22,7 @@ lanzarlos sin romper nada.
 | 9 | `inventario-6.sql` | `eliminar_producto` (borrado seguro desde el panel) |
 | 10 | `inventario-7.sql` | Informes: `informe_resumen`, `informe_ventas_diarias`, `informe_mas_vendidos` |
 | 11 | `inventario-8.sql` | Compras a proveedor: pedidos de compra, tramos de descuento y recepción con coste medio (WAC) |
+| 12 | `inventario-9.sql` | Separa marca (atributo del producto) de proveedor; crea el proveedor real "Lekkerland" |
 
 ## Edge Functions
 

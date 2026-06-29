@@ -296,7 +296,7 @@ function bindEvents(){
       },
     });
     if(res.reason === 'empty'){ showToast('Tu carrito está vacío'); return; }
-    if(res.reason === 'auth' || res.reason === 'redirect') return;   // navegando a login/Stripe
+    if(res.reason === 'auth' || res.reason === 'redirect' || res.reason === 'address') return;   // navegando a login/Stripe/perfil
     if(res.ok){ cart = {}; sessionStorage.removeItem('kq_cart'); updateCart(); closeCart(); location.href = 'pedido.html?id=' + res.id; return; }
     if(res.error){ showToast(res.error); }
   });

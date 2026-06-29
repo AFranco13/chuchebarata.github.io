@@ -141,6 +141,13 @@
       else alert(res.error);
     });
 
+    // Si se llega desde el checkout por falta de dirección, abrir esa
+    // pestaña y avisar.
+    if (new URLSearchParams(location.search).get('completar') === 'direccion') {
+      showTab('direccion');
+      flash('#dirMsg', 'Añade tu dirección de envío para poder finalizar la compra.', false);
+    }
+
     await renderOrders();
   })();
 })();

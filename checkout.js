@@ -35,6 +35,14 @@
 
       const u = await Auth.getCurrentUser();
       const d = (u && u.direccion) || {};
+
+      // Exige una dirección de envío completa antes de tramitar/pagar.
+      const campo = k => ((d[k] || '') + '').trim();
+      if (!campo('linea1') || !campo('cp') || !campo('ciudad') || !campo('provincia')) {
+        location.href = 'perfil.html?completar=direccion#direccion';
+        return { ok: false, reason: 'address' };
+      }
+
       const direccion = {
         nombre: (u && u.nombre) || '', telefono: (u && u.telefono) || '',
         linea1: d.linea1 || '', linea2: d.linea2 || '',

@@ -13,7 +13,7 @@ en `supabase-config.js` (el pedido se crea sin cobro, modo pruebas).
 
 ## 1. Base de datos
 
-En Supabase → **SQL Editor**, ejecuta el archivo **`supabase-pagos.sql`**
+En Supabase → **SQL Editor**, ejecuta el archivo **`db/supabase-pagos.sql`**
 (permite crear el pedido como "pendiente" mientras se paga).
 
 ## 2. Instalar la CLI de Supabase (en tu ordenador)

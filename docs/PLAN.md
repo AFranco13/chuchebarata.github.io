@@ -7,45 +7,45 @@ Estado: marca cada casilla al completarla.
 
 ## FASE 1 — Catálogo en base de datos + blindaje de precios ⭐ (en curso)
 
-- [x] 🤖 SQL `inventario-1.sql`: tablas `products` y `suppliers` + RLS + vista `vista_inventario`
+- [x] 🤖 SQL `db/inventario-1.sql`: tablas `products` y `suppliers` + RLS + vista `vista_inventario`
 - [x] 🤖 Migración del catálogo (32 productos + 10 proveedores desde la marca; stock inicial 100, mínimo 20)
-- [x] 🧑 Ejecutar `inventario-1.sql` en el SQL Editor de Supabase ✓ (32 filas)
+- [x] 🧑 Ejecutar `db/inventario-1.sql` en el SQL Editor de Supabase ✓ (32 filas)
 - [x] 🤖 `auth.js`: `getProductos()` / `getProducto(id)` + `aplicarInventario()` (con respaldo a `productos_data.js`)
 - [x] 🤖 Tienda lee de la BD: `app.js`, `producto.js`, `caja.js` (precio y stock en vivo, respaldo al fichero)
-- [x] 🤖 Blindaje: `crear_pedido` toma el **precio desde `products`** y recalcula totales (`inventario-2.sql`)
-- [ ] 🧑 Ejecutar `inventario-2.sql` en Supabase
+- [x] 🤖 Blindaje: `crear_pedido` toma el **precio desde `products`** y recalcula totales (`db/inventario-2.sql`)
+- [ ] 🧑 Ejecutar `db/inventario-2.sql` en Supabase
 - [x] 🤖 Validar y subir
 
 ---
 
 ## FASE 2 — Panel de administración de productos y proveedores
 
-- [x] 🤖 RPC `crear_producto`, `actualizar_producto`, `ajustar_stock` + seguridad (`inventario-3.sql`: vista pública `catalogo_publico`, tabla solo-admin)
+- [x] 🤖 RPC `crear_producto`, `actualizar_producto`, `ajustar_stock` + seguridad (`db/inventario-3.sql`: vista pública `catalogo_publico`, tabla solo-admin)
 - [x] 🤖 `admin.html`/`admin.js`: pestaña **Productos** (listado, alta, edición de precio/stock, activar/desactivar)
 - [x] 🤖 Filtro por proveedor + columna de proveedor en el listado
 - [x] 🤖 Vista **"Proveedores"** (nº productos, valor stock, plazo) → sus productos
 - [x] 🤖 Coste y margen por producto en el listado admin
-- [ ] 🧑 Ejecutar `inventario-3.sql` y probar
+- [ ] 🧑 Ejecutar `db/inventario-3.sql` y probar
 - [x] 🤖 Escaparate desde la BD: altas/bajas/precio/stock del admin se reflejan en la tienda (`fusionarCatalogo`)
 
 ---
 
 ## FASE 3 — Stock automático con las ventas
 
-- [x] 🤖 Tabla `stock_movements` + RPC `descontar_stock_pedido` / `reponer_stock_pedido` (`inventario-5.sql`)
+- [x] 🤖 Tabla `stock_movements` + RPC `descontar_stock_pedido` / `reponer_stock_pedido` (`db/inventario-5.sql`)
 - [x] 🤖 `stripe-webhook`: descuenta stock al confirmar el pago
 - [x] 🤖 Admin: reponer stock al cancelar (en `actualizar_estado_pedido`)
 - [x] 🤖 Tienda: "Agotado" en portada y ficha; bloqueo de añadir; aviso ⚠ stock bajo en el panel
-- [ ] 🧑 Ejecutar `inventario-5.sql` + re-desplegar `stripe-webhook` + probar compra
+- [ ] 🧑 Ejecutar `db/inventario-5.sql` + re-desplegar `stripe-webhook` + probar compra
 
 ---
 
 ## FASE 4 — Informes
 
-- [x] 🤖 SQL `inventario-7.sql`: RPCs solo-admin `informe_resumen` / `informe_ventas_diarias` / `informe_mas_vendidos`
+- [x] 🤖 SQL `db/inventario-7.sql`: RPCs solo-admin `informe_resumen` / `informe_ventas_diarias` / `informe_mas_vendidos`
 - [x] 🤖 Admin: pestaña **Informes** (resumen, ventas por día, más vendidos, margen) con selector de fechas
 - [x] 🤖 Exportar a CSV
-- [ ] 🧑 Ejecutar `inventario-7.sql` en Supabase
+- [ ] 🧑 Ejecutar `db/inventario-7.sql` en Supabase
 
 ---
 
@@ -80,4 +80,4 @@ Estado: marca cada casilla al completarla.
 - `ARQUITECTURA.md` — visión global del e-commerce
 - `INVENTARIO.md` — diseño de inventario, proveedores, compras y WAC
 - `PAGOS-STRIPE.md` — configuración de la pasarela de pago
-- `supabase-schema.sql` · `supabase-admin.sql` · `supabase-pagos.sql` · `inventario-1.sql`…`inventario-7.sql` — SQL a ejecutar en Supabase
+- `db/supabase-schema.sql` · `db/supabase-admin.sql` · `db/supabase-pagos.sql` · `db/inventario-1.sql`…`db/inventario-7.sql` — SQL a ejecutar en Supabase

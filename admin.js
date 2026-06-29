@@ -118,7 +118,7 @@
     cont.innerHTML = '<p style="color:var(--muted)">Cargando productos…</p>';
     await cargarInventario();
     if (!inventario.length) {
-      cont.innerHTML = `<div class="empty-state"><b>Sin productos</b>Ejecuta la migración del catálogo (inventario-1.sql) o crea uno nuevo.</div>`;
+      cont.innerHTML = `<div class="empty-state"><b>Sin productos</b>Ejecuta la migración del catálogo (db/inventario-1.sql) o crea uno nuevo.</div>`;
       return;
     }
     const provs = proveedoresUnicos();

@@ -16,7 +16,7 @@ window.SUPABASE_CONFIG = {
   stripePublishableKey: 'pk_test_51TnGXQDU1gvx4Ho7vZGfpiyWH22hcQaKRLoJe80K4TvbuM3SUV79gdj35CUPBAlgNtyricZ5Oat5ug2r3LwDi2dA009YOibeDf',
 
   /* Pon esto en true SOLO cuando hayas desplegado las Edge Functions de
-     pago y configurado los secretos (ver PAGOS-STRIPE.md). Mientras esté
+     pago y configurado los secretos (ver docs/PAGOS-STRIPE.md). Mientras esté
      en false, el pedido se crea sin cobro (modo pruebas). */
   paymentsEnabled: true,
 };

@@ -16,6 +16,48 @@
   const ymd = d => d.toISOString().slice(0, 10);
   const fechaCorta = iso => new Date(iso + 'T00:00:00').toLocaleDateString('es-ES', { day:'2-digit', month:'short' });
   const num = n => (Number(n) || 0).toLocaleString('es-ES');
+  // Euro compacto para el eje (1234 -> "1,2k", 90 -> "90").
+  const eurCorto = v => {
+    v = Number(v) || 0;
+    if (v >= 1000) return (v / 1000).toFixed(v >= 10000 ? 0 : 1).replace('.', ',') + 'k';
+    return String(Math.round(v));
+  };
+
+  /* Gráfico de barras (ingresos por día) como SVG responsivo: escala al
+     ancho del contenedor con viewBox, sin scrollbars ni recortes. Rejilla
+     y eje Y con 3 marcas; las etiquetas del eje X se ralean si hay muchos
+     días y se inclinan para no solaparse. */
+  function chartBarrasSVG(datos) {
+    const W = 760, H = 240, padL = 52, padR = 14, padT = 16, padB = 42;
+    const cw = W - padL - padR, ch = H - padT - padB, n = datos.length;
+    const maxv = datos.reduce((m, d) => Math.max(m, Number(d.ingresos) || 0), 0) || 1;
+    const slot = cw / n, bw = Math.min(slot * 0.6, 44);
+    const step = Math.max(1, Math.ceil(n / 12));
+    const inclina = n > 10;
+
+    const grid = [0, 0.5, 1].map(f => {
+      const y = padT + ch - f * ch;
+      return `<line x1="${padL}" y1="${y.toFixed(1)}" x2="${W - padR}" y2="${y.toFixed(1)}" class="inf-grid"/>`
+        + `<text x="${padL - 8}" y="${(y + 3).toFixed(1)}" class="inf-ytick" text-anchor="end">${eurCorto(maxv * f)}</text>`;
+    }).join('');
+
+    const bars = datos.map((d, i) => {
+      const val = Number(d.ingresos) || 0;
+      const bh = val > 0 ? Math.max(val / maxv * ch, 2) : 0;
+      const x = padL + i * slot + (slot - bw) / 2;
+      const y = padT + ch - bh;
+      const cx = x + bw / 2, ly = H - padB + 16;
+      const lbl = (i % step === 0 || i === n - 1)
+        ? `<text x="${cx.toFixed(1)}" y="${ly}" class="inf-xtick" text-anchor="${inclina ? 'end' : 'middle'}"`
+          + `${inclina ? ` transform="rotate(-40 ${cx.toFixed(1)} ${ly})"` : ''}>${fechaCorta(d.dia)}</text>`
+        : '';
+      return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${bh.toFixed(1)}" rx="3" class="inf-rect">`
+        + `<title>${fechaCorta(d.dia)}: ${eur(d.ingresos)} · margen ${eur(d.margen)}</title></rect>${lbl}`;
+    }).join('');
+
+    return `<svg class="inf-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Ingresos por día">`
+      + `${grid}<line x1="${padL}" y1="${padT + ch}" x2="${W - padR}" y2="${padT + ch}" class="inf-axis"/>${bars}</svg>`;
+  }
 
   // Descarga una matriz [[...],[...]] como CSV (separador ; para Excel ES).
   function descargarCSV(nombre, filas) {
@@ -209,7 +251,6 @@
       Auth.getInformeTop(infDesde, infHasta, 20),
     ]);
     const r = infResumen || { pedidos: 0, unidades: 0, ingresos: 0, coste: 0, margen: 0 };
-    const maxDia = infDiario.reduce((m, d) => Math.max(m, Number(d.ingresos) || 0), 0) || 1;
 
     cont.innerHTML = `
       <div class="admin-toolbar">
@@ -228,12 +269,8 @@
       </div>
 
       <h3 class="inf-h">Ventas por día</h3>
-      ${infDiario.length ? `<div class="inf-bars">${infDiario.map(d => {
-        const h = Math.round((Number(d.ingresos) || 0) / maxDia * 100);
-        return `<div class="inf-bar" title="${fechaCorta(d.dia)}: ${eur(d.ingresos)} · margen ${eur(d.margen)}">
-          <span class="inf-bar-fill" style="height:${Math.max(h, 2)}%"></span>
-          <small>${fechaCorta(d.dia)}</small></div>`;
-      }).join('')}</div>` : `<div class="empty-state">Sin ventas en este periodo.</div>`}
+      ${infDiario.length ? `<div class="inf-chart">${chartBarrasSVG(infDiario)}</div>`
+        : `<div class="empty-state">Sin ventas en este periodo.</div>`}
 
       <h3 class="inf-h">Más vendidos</h3>
       ${infTop.length ? `<div class="inv-wrap"><table class="inv-table">

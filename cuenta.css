@@ -224,11 +224,13 @@
 .inf-card .inf-k{display:block;color:var(--muted);font-size:.82rem;font-weight:600;margin-bottom:6px}
 .inf-card b{font-family:var(--display);font-size:1.5rem;color:var(--ink)}
 .inf-h{font-family:var(--display);font-size:var(--s1);margin:26px 0 14px}
-.inf-bars{display:flex;align-items:flex-end;gap:6px;height:180px;padding:10px 4px 0;
-  background:#fff;border:1px solid var(--line);border-radius:var(--r);overflow-x:auto}
-.inf-bar{flex:1 0 26px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
-.inf-bar-fill{width:60%;min-height:2px;background:var(--wine);border-radius:5px 5px 0 0;transition:height .3s var(--ease)}
-.inf-bar small{margin-top:6px;font-size:.66rem;color:var(--muted);white-space:nowrap;transform:rotate(-45deg);transform-origin:top right}
+.inf-chart{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:14px 16px 8px}
+.inf-svg{display:block;width:100%;height:auto}
+.inf-rect{fill:var(--wine);transition:opacity .15s}
+.inf-rect:hover{opacity:.72}
+.inf-grid{stroke:var(--line);stroke-width:1}
+.inf-axis{stroke:var(--line-strong);stroke-width:1}
+.inf-ytick,.inf-xtick{fill:var(--muted);font-family:var(--sans);font-size:11px}
 @media(max-width:640px){.inf-cards{grid-template-columns:repeat(2,1fr)}}
 
 /* ===================== DETALLE / SEGUIMIENTO DE PEDIDO ===================== */

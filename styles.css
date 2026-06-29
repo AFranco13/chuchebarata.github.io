@@ -83,7 +83,7 @@ h1,h2,h3,h4{font-family:var(--display);font-weight:600;line-height:1.08;letter-s
 
 /* ---------- header ---------- */
 header{position:sticky;top:0;z-index:50;background:rgba(251,244,239,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-.header-in{display:flex;align-items:center;gap:28px;height:80px}
+.header-in{display:flex;align-items:center;gap:28px;height:52px}
 .brand{display:flex;align-items:center;gap:11px;color:var(--wine)}
 .brand-mark{width:60px;height:60px;flex-shrink:0;object-fit:contain}
 .brand-name{font-family:var(--display);font-weight:700;font-size:1.22rem;letter-spacing:-.02em;color:var(--ink)}

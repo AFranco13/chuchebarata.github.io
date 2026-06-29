@@ -52,7 +52,10 @@ disponibles automáticamente en las funciones; no hace falta añadirlas.)
 1. Stripe → **Developers → Webhooks → Add endpoint**.
 2. **Endpoint URL**:
    `https://kfoawabtfzjeikcpdnjf.supabase.co/functions/v1/stripe-webhook`
-3. **Eventos a escuchar**: marca `checkout.session.completed`.
+3. **Eventos a escuchar**: marca estos tres (los dos últimos cubren Bizum/SEPA):
+   - `checkout.session.completed`
+   - `checkout.session.async_payment_succeeded`
+   - `checkout.session.async_payment_failed`
 4. Guarda y copia el **Signing secret** (`whsec_…`). Luego:
 
 ```bash

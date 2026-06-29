@@ -33,27 +33,30 @@ Deno.serve(async (req) => {
     return new Response(`Firma no válida: ${(e as Error).message}`, { status: 400 });
   }
 
-  if (event.type === 'checkout.session.completed') {
-    const session = event.data.object as Stripe.Checkout.Session;
-    const orderId = (session.metadata?.order_id) || session.client_reference_id;
+  // Pago confirmado: tarjeta (completed + paid) o métodos asíncronos como
+  // Bizum/SEPA (async_payment_succeeded).
+  const session = event.data.object as Stripe.Checkout.Session;
+  const orderId = (session.metadata?.order_id) || session.client_reference_id;
+  const pagado =
+    event.type === 'checkout.session.async_payment_succeeded' ||
+    (event.type === 'checkout.session.completed' && session.payment_status === 'paid');
 
-    if (orderId) {
-      // Solo confirma si seguía pendiente (evita duplicados).
-      const { data: updated } = await admin
-        .from('orders')
-        .update({ estado: 'confirmado', updated_at: new Date().toISOString() })
-        .eq('id', orderId)
-        .eq('estado', 'pendiente')
-        .select('id');
+  if (pagado && orderId) {
+    // Solo confirma si seguía pendiente (evita duplicados).
+    const { data: updated } = await admin
+      .from('orders')
+      .update({ estado: 'confirmado', updated_at: new Date().toISOString() })
+      .eq('id', orderId)
+      .eq('estado', 'pendiente')
+      .select('id');
 
-      if (updated && updated.length) {
-        await admin.from('order_tracking_events').insert({
-          order_id: orderId,
-          estado: 'confirmado',
-          descripcion: 'Hemos recibido tu pago y confirmado el pedido.',
-          actor: 'pago',
-        });
-      }
+    if (updated && updated.length) {
+      await admin.from('order_tracking_events').insert({
+        order_id: orderId,
+        estado: 'confirmado',
+        descripcion: 'Hemos recibido tu pago y confirmado el pedido.',
+        actor: 'pago',
+      });
     }
   }
 

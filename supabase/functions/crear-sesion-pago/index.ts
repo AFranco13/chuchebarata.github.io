@@ -39,11 +39,13 @@ Deno.serve(async (req) => {
     if (!user) return json({ error: 'No autenticado' }, 401);
 
     const { orderId, base } = await req.json();
+    console.log('crear-sesion-pago · body:', JSON.stringify({ orderId, base }));
     if (!orderId) return json({ error: 'Falta el pedido' }, 400);
 
     // Base de la web (incluye subcarpeta si la hay). Debe acabar en "/".
     let site = base || SUPABASE_URL;
     if (!site.endsWith('/')) site += '/';
+    console.log('crear-sesion-pago · site:', site);
 
     // Lee el pedido con permisos de servicio (fuente de verdad de los importes).
     const admin = createClient(SUPABASE_URL, SERVICE_KEY);
@@ -85,8 +87,10 @@ Deno.serve(async (req) => {
       metadata: { order_id: order.id, user_id: user.id },
     });
 
+    console.log('crear-sesion-pago · sesión creada:', session.id);
     return json({ url: session.url });
   } catch (e) {
+    console.error('crear-sesion-pago · ERROR:', (e as Error)?.message, (e as Error)?.stack);
     return json({ error: (e as Error)?.message || 'Error al iniciar el pago' }, 500);
   }
 });

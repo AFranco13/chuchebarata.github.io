@@ -10,7 +10,17 @@
 -- =========================================================
 
 -- Más precisión en el coste para que el WAC no se redondee a 2 decimales.
+-- vista_inventario depende de precio_coste, así que se elimina y se vuelve
+-- a crear (idéntica a inventario-3.sql) alrededor del cambio de tipo.
+drop view if exists public.vista_inventario;
 alter table public.products alter column precio_coste type numeric(10,4);
+create view public.vista_inventario with (security_invoker = true) as
+  select p.id, p.sku, p.nombre, p.categoria, p.cat_label, p.stock, p.stock_minimo,
+         p.precio_coste, p.precio, round(p.precio - p.precio_coste, 2) as margen_eur,
+         p.proveedor_id, s.nombre as proveedor, s.plazo_entrega_dias, p.activo
+  from public.products p
+  left join public.suppliers s on s.id = p.proveedor_id;
+grant select on public.vista_inventario to authenticated;
 
 -- stock_movements: vincular la entrada a su pedido de compra y su coste.
 alter table public.stock_movements add column if not exists purchase_order_id uuid;

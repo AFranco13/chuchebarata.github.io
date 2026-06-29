@@ -261,6 +261,39 @@
       };
     },
 
+    /* Fusiona el catálogo en vivo de la BD (qué productos existen + precio
+       y stock) con el contenido estático (descripciones, iconos…) por id.
+       - La EXISTENCIA la manda la BD: altas aparecen, bajas/desactivados
+         desaparecen.
+       - El CONTENIDO se toma del catálogo estático cuando existe.
+       Si la BD no responde o está vacía, devuelve el estático tal cual
+       (respaldo seguro). `estaticos` es PRODUCTS o PRODUCTOS_DATA. */
+    fusionarCatalogo(live, estaticos) {
+      const base = Array.isArray(estaticos) ? estaticos : [];
+      if (!live || !live.length) return base.slice();
+      const byId = {}; base.forEach(p => { byId[p.id] = p; });
+      const ART_CAT = { gominolas:'bear', nubes:'nube', caramelos:'wrapped', chocolate:'choc',
+        regaliz:'licorice', chicles:'gum', conos:'gift', decoracion:'balloon' };
+      return live.map(lp => {
+        const b = byId[lp.id] || {};
+        const m = Object.assign({}, b);
+        m.id = lp.id;
+        m.nombre = lp.nombre || b.nombre || b.name || '';
+        m.name = m.nombre;
+        m.cat = lp.cat || b.cat || '';
+        m.cat_label = lp.cat_label || b.cat_label || '';
+        m.slug = lp.slug || b.slug || '';
+        m.img = lp.img || b.img || '';
+        m.art = b.art || ART_CAT[m.cat] || 'bear';
+        m.price = lp.price;
+        m.precio_comp = (lp.precio_comp != null) ? lp.precio_comp : b.precio_comp;
+        m.meta = b.meta || m.cat_label || '';
+        m.en_stock = lp.en_stock;
+        m.stock = lp.stock;
+        return m;
+      });
+    },
+
     /* Superpone precio/stock en vivo (de la BD) sobre los catálogos en
        memoria (PRODUCTS / PRODUCTOS_DATA). Devuelve true si aplicó datos.
        Si la BD no responde o está vacía, no toca nada (respaldo seguro). */

@@ -353,10 +353,33 @@ document.addEventListener('DOMContentLoaded', () => {
     showToast('Has cancelado el pago. Tu pedido sigue pendiente en tu cuenta.');
   }
 
-  // Precio y stock en vivo desde la BD: re-render al llegar (no bloquea).
+  // Escaparate desde la BD: el catálogo en vivo (altas/bajas/precio/stock)
+  // sustituye al estático cuando responde; si no, se queda el de respaldo.
   if(window.Auth){
-    Auth.aplicarInventario(PRODUCTS, typeof PRODUCTOS_DATA !== 'undefined' ? PRODUCTOS_DATA : null)
-      .then(ok => { if(ok){ if($('#productGrid')) refresh(); updateCart(); } })
+    Auth.getProductos()
+      .then(live => {
+        if(live && live.length){
+          // Catálogo completo (todas las páginas / detalle): refleja altas y bajas.
+          if(typeof PRODUCTOS_DATA !== 'undefined' && Array.isArray(PRODUCTOS_DATA)){
+            const full = Auth.fusionarCatalogo(live, PRODUCTOS_DATA);
+            PRODUCTOS_DATA.length = 0;
+            full.forEach(x => PRODUCTOS_DATA.push(x));
+          }
+          // Portada curada: solo precio/stock en vivo sobre los destacados.
+          const byId = {};
+          live.forEach(p => { byId[p.id] = p; });
+          for(let i = PRODUCTS.length - 1; i >= 0; i--){
+            const u = byId[PRODUCTS[i].id];
+            if(!u){ PRODUCTS.splice(i, 1); continue; } // se dio de baja/desactivó
+            PRODUCTS[i].price = u.price;
+            PRODUCTS[i].stock = u.stock;
+            PRODUCTS[i].en_stock = u.en_stock;
+            if(u.precio_comp != null) PRODUCTS[i].precio_comp = u.precio_comp;
+          }
+          if($('#productGrid')) refresh();
+          updateCart();
+        }
+      })
       .catch(() => {});
   }
 });

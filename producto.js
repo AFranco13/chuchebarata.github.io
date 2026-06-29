@@ -246,8 +246,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // Precio y stock en vivo desde la BD (con respaldo a los datos del fichero).
-  if (window.Auth) { try { await Auth.aplicarInventario(PRODUCTOS_DATA); } catch (e) {} }
+  // Escaparate desde la BD: el catálogo en vivo (altas/bajas/precio/stock)
+  // sustituye al estático cuando responde; si no, queda el de respaldo.
+  if (window.Auth) {
+    try {
+      const live = await Auth.getProductos();
+      if (live && live.length) {
+        const full = Auth.fusionarCatalogo(live, PRODUCTOS_DATA);
+        PRODUCTOS_DATA.length = 0;
+        full.forEach(x => PRODUCTOS_DATA.push(x));
+      }
+    } catch (e) {}
+  }
 
   const idParam = parseInt(getParam('id'), 10);
   const p = PRODUCTOS_DATA.find(x => x.id === idParam);

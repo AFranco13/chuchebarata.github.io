@@ -151,7 +151,7 @@ function cajaRenderItems() {
     : '<p class="caja-empty">Sin productos. Ajusta el presupuesto o añade uno del desplegable.</p>';
 
   cajaRenderTotal();
-  cajaRenderSelect();
+  cajaRenderPicker();
 }
 
 function cajaRenderTotal() {
@@ -164,14 +164,30 @@ function cajaRenderTotal() {
   if (lEl) lEl.classList.toggle('caja-total-over', total > cajaBudget + 0.01);
 }
 
-function cajaRenderSelect() {
-  const sel = $('#cajaAddSelect');
-  if (!sel) return;
+/* Selector visual de productos para añadir a la caja (rejilla con miniatura,
+   nombre y precio + buscador), en sustitución del antiguo desplegable. */
+let cajaPickerQuery = '';
+function cajaRenderPicker() {
+  const grid = $('#cajaPickerGrid');
+  if (!grid) return;
   const ids = new Set(cajaSelection.map(p => p.id));
-  const available = PRODUCTOS_DATA.filter(p => p.en_stock && !ids.has(p.id));
-  sel.innerHTML = available.length
-    ? available.map(p => `<option value="${p.id}">${p.nombre || p.name} · ${eur(p.price)}</option>`).join('')
-    : '<option value="">No quedan más productos</option>';
+  const q = cajaPickerQuery.trim().toLowerCase();
+  let available = PRODUCTOS_DATA.filter(p => p.en_stock && !ids.has(p.id));
+  if (q) available = available.filter(p =>
+    ((p.nombre || p.name || '') + ' ' + (p.cat_label || '') + ' ' + (p.marca || '')).toLowerCase().includes(q));
+  grid.innerHTML = available.length
+    ? available.map(p => {
+        const bg = TINTS[p.cat] || 'var(--blush)';
+        const thumb = p.img ? `<img src="${p.img}" alt="" loading="lazy">` : (ART[p.art] || '');
+        const nombre = p.nombre || p.name;
+        return `<button class="caja-pick" data-pick="${p.id}" type="button" title="Añadir ${nombre}">
+          <span class="caja-pick-add" aria-hidden="true">+</span>
+          <span class="caja-pick-thumb" style="background:${bg}">${thumb}</span>
+          <span class="caja-pick-name">${nombre}</span>
+          <span class="caja-pick-price">${eur(p.price)}</span>
+        </button>`;
+      }).join('')
+    : `<p class="caja-picker-empty">${q ? 'No hay productos que coincidan.' : 'No quedan más productos para añadir.'}</p>`;
 }
 
 /* ── sugerencias ─────────────────────────────────────────── */
@@ -254,6 +270,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       const id = parseInt(rem.dataset.remove, 10);
       cajaSelection = cajaSelection.filter(p => p.id !== id);
       cajaRenderItems();
+      return;
+    }
+    const pick = e.target.closest('[data-pick]');
+    if (pick) {
+      const id = parseInt(pick.dataset.pick, 10);
+      const prod = PRODUCTOS_DATA.find(p => p.id === id);
+      if (prod && !cajaSelection.find(p => p.id === id)) {
+        cajaSelection.push(prod);
+        showToast(`${prod.nombre || prod.name} · añadido a la caja`);
+        cajaRenderItems();   // refresca la lista y el selector (quita el añadido)
+      }
+      return;
     }
   });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCart(); });
@@ -292,15 +320,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     cajaRenderItems();
   });
 
+  // Botón "Añadir producto": despliega/oculta el selector visual.
   $('#cajaAddBtn').addEventListener('click', () => {
-    const sel = $('#cajaAddSelect');
-    if (!sel || !sel.value) return;
-    const id = parseInt(sel.value, 10);
-    const prod = PRODUCTOS_DATA.find(p => p.id === id);
-    if (prod && !cajaSelection.find(p => p.id === id)) {
-      cajaSelection.push(prod);
-      cajaRenderItems();
+    const picker = $('#cajaPicker');
+    const btn = $('#cajaAddBtn');
+    const abrir = picker.hidden;
+    picker.hidden = !abrir;
+    btn.setAttribute('aria-expanded', String(abrir));
+    if (abrir) {
+      cajaRenderPicker();
+      const s = $('#cajaPickerSearch');
+      if (s) s.focus();
+      picker.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
+  });
+
+  // Buscador del selector.
+  const pickerSearch = $('#cajaPickerSearch');
+  if (pickerSearch) pickerSearch.addEventListener('input', e => {
+    cajaPickerQuery = e.target.value;
+    cajaRenderPicker();
   });
 
   $('#cajaCartBtn').addEventListener('click', () => {

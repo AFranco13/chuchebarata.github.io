@@ -329,8 +329,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     btn.setAttribute('aria-expanded', String(abrir));
     if (abrir) {
       cajaRenderPicker();
+      // Enfocar el buscador solo en escritorio: en móvil (puntero táctil)
+      // evitamos que se abra el teclado automáticamente.
+      const finePointer = window.matchMedia && window.matchMedia('(pointer: fine)').matches;
       const s = $('#cajaPickerSearch');
-      if (s) s.focus();
+      if (s && finePointer) s.focus();
       picker.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   });

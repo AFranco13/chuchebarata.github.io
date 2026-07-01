@@ -82,6 +82,7 @@ Estado: marca cada casilla al completarla.
 ---
 
 ### Documentos de referencia
+- `PLAN-NEGOCIO.md` — modelo de negocio, cliente objetivo y objetivos de rentabilidad
 - `ARQUITECTURA.md` — visión global del e-commerce
 - `INVENTARIO.md` — diseño de inventario, proveedores, compras y WAC
 - `PAGOS-STRIPE.md` — configuración de la pasarela de pago

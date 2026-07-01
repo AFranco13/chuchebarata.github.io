@@ -32,6 +32,7 @@ datos, funciones) y pagos con **Stripe Checkout**.
 ## Documentación
 
 - [`docs/PLAN.md`](docs/PLAN.md) — plan de implementación por fases (estado actual)
+- [`docs/PLAN-NEGOCIO.md`](docs/PLAN-NEGOCIO.md) — modelo de negocio, cliente objetivo y objetivos de rentabilidad
 - [`docs/ARQUITECTURA.md`](docs/ARQUITECTURA.md) — visión global del e-commerce
 - [`docs/INVENTARIO.md`](docs/INVENTARIO.md) — inventario, proveedores, compras y coste medio (WAC)
 - [`docs/PAGOS-STRIPE.md`](docs/PAGOS-STRIPE.md) — configuración de la pasarela de pago

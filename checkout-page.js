@@ -11,6 +11,9 @@
   const $ = s => document.querySelector(s);
   const eur = n => (Number(n) || 0).toFixed(2).replace('.', ',') + ' €';
   const FREE_SHIPPING = 49;
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  let modoInvitado = false;
 
   const TINTS = {
     gominolas:'var(--t-gominolas)', nubes:'var(--t-nubes)', caramelos:'var(--t-caramelos)',
@@ -121,20 +124,25 @@
     $('#co-provincia').value = d.provincia || '';
   }
 
-  function flash(msg, ok) {
+  function flash(msg, ok, html) {
     const el = $('#checkoutMsg');
-    el.textContent = msg;
+    if (html) el.innerHTML = msg; else el.textContent = msg;
     el.classList.remove('ok', 'error');
     el.classList.add(ok ? 'ok' : 'error', 'show');
   }
 
   function validarFormulario() {
     const requeridos = ['co-nombre', 'co-linea1', 'co-cp', 'co-ciudad', 'co-provincia'];
+    if (modoInvitado) requeridos.unshift('co-email', 'co-password');
     document.querySelectorAll('.field.invalid').forEach(f => f.classList.remove('invalid'));
     let primero = null;
     requeridos.forEach(id => {
       const input = $('#' + id);
-      if (!input.value.trim()) {
+      const val = input.value.trim();
+      let invalido = !val;
+      if (id === 'co-email' && val && !EMAIL_RE.test(val)) invalido = true;
+      if (id === 'co-password' && val && val.length < 6) invalido = true;
+      if (invalido) {
         input.closest('.field').classList.add('invalid');
         if (!primero) primero = input;
       }
@@ -145,8 +153,13 @@
 
   async function onSubmit(e) {
     e.preventDefault();
+
+    if (modoInvitado && (!$('#co-legal').checked || !$('#co-edad').checked)) {
+      flash('Debes aceptar la política de privacidad y confirmar tu edad.', false);
+      return;
+    }
     if (!validarFormulario()) {
-      flash('Completa los campos obligatorios de la dirección.', false);
+      flash('Completa los campos obligatorios.', false);
       return;
     }
 
@@ -164,6 +177,37 @@
       ciudad: $('#co-ciudad').value.trim(),
       provincia: $('#co-provincia').value.trim(),
     };
+
+    // Cliente invitado: crea la cuenta sobre la marcha en vez de pedirle
+    // que inicie sesión antes. Si ya existe una cuenta con ese correo, se
+    // le invita a iniciar sesión con ella (el carrito no se pierde: sigue
+    // en sessionStorage al volver de login.html).
+    if (modoInvitado) {
+      const email = $('#co-email').value.trim();
+      const password = $('#co-password').value;
+      const alta = await Auth.register({ nombre: direccion.nombre, email, password });
+
+      if (!alta.ok) {
+        btn.disabled = false;
+        btn.textContent = textoOriginal;
+        if (/ya existe una cuenta/i.test(alta.error || '')) {
+          $('#co-email').closest('.field').classList.add('invalid');
+          flash('Ya existe una cuenta con ese correo. <a href="login.html?returnTo=checkout.html">Inicia sesión</a> para continuar con tu pedido.', false, true);
+        } else {
+          flash(alta.error || 'No se ha podido crear la cuenta.', false);
+        }
+        return;
+      }
+      if (alta.needsConfirm) {
+        btn.disabled = false;
+        btn.textContent = textoOriginal;
+        flash('¡Cuenta creada! Te hemos enviado un correo para confirmarla. Confírmala y vuelve para completar tu pedido.', true);
+        return;
+      }
+      // Sesión iniciada automáticamente: seguimos como cliente ya autenticado.
+      modoInvitado = false;
+      $('#guestPanel').hidden = true;
+    }
 
     // Guarda el perfil de cara a futuros pedidos; si falla, no bloquea la
     // compra (no tiene sentido perder una venta por esto).
@@ -195,16 +239,19 @@
 
   /* ── init ────────────────────────────────────────────────── */
   document.addEventListener('DOMContentLoaded', async () => {
-    const user = await Auth.requireAuth('checkout.html');
-    if (!user) return;   // ya redirigido a login.html?returnTo=checkout.html
-
     if (!Object.keys(cart).length) { mostrarVacio(); return; }
+
+    // Sin sesión: no se manda a login/registro, se rellena todo aquí mismo
+    // (incluida la contraseña) y la cuenta se crea al confirmar el pedido.
+    const user = await Auth.getCurrentUser();
+    modoInvitado = !user;
+    if (modoInvitado) $('#guestPanel').hidden = false;
 
     await resolverCatalogo();
     const items = pintarResumen();
     if (!items.length) { mostrarVacio(); return; }
 
-    precargarFormulario(user);
+    if (user) precargarFormulario(user);
 
     if (new URLSearchParams(location.search).get('pago') === 'cancelado') {
       flash('Has cancelado el pago. Tu pedido sigue pendiente, puedes intentarlo de nuevo.', false);

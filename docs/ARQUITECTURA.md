@@ -18,12 +18,13 @@ flowchart TB
     AuthJS["auth.js<br/>cliente Supabase + API"]
     CheckoutPage["checkout.html<br/>dirección de envío + resumen"]
     CheckoutJS["checkout.js<br/>orquesta pedido y pago"]
+    AnalyticsJS["analytics.js<br/>eventos del embudo de compra"]
   end
 
   subgraph SUPA["☁️ Supabase · backend en la UE"]
     direction TB
     AuthSB["Auth<br/>usuarios · sesiones · correos"]
-    DB[("PostgreSQL<br/>profiles · orders · order_items · tracking<br/>RLS + funciones RPC")]
+    DB[("PostgreSQL<br/>profiles · orders · order_items · tracking · eventos_analitica<br/>RLS + funciones RPC")]
     EF1["Edge Function<br/>crear-sesion-pago"]
     EF2["Edge Function<br/>stripe-webhook"]
   end
@@ -31,6 +32,8 @@ flowchart TB
   subgraph STRIPE["💳 Stripe"]
     Checkout["Checkout alojado<br/>tarjeta · Bizum · wallets"]
   end
+
+  GA4["📊 Google Analytics 4<br/>tráfico y visitantes"]
 
   Tienda --> Carrito
   Cuenta --> AuthJS
@@ -44,7 +47,10 @@ flowchart TB
   EF1 -->|"lee importes reales"| DB
   EF1 -->|"crea sesión"| Checkout
   Checkout -. "webhook: pago confirmado" .-> EF2
-  EF2 -->|"estado = confirmado"| DB
+  EF2 -->|"estado = confirmado + evento order_paid"| DB
+  Tienda -.->|"consentimiento 'Analítica'"| AnalyticsJS
+  AnalyticsJS -->|"eventos_analitica (insert)"| DB
+  AnalyticsJS -. "gtag('event', ...)" .-> GA4
 ```
 
 ---
@@ -144,7 +150,22 @@ flowchart LR
 
 ---
 
-## 5. Seguridad en una mirada
+## 5. Métricas del embudo de compra
+
+`analytics.js` registra en `eventos_analitica` (Supabase) los pasos del
+embudo de compra — añadir al carrito, pulsar "Tramitar pedido", ver el
+checkout, pago cancelado, pedido creado/pagado — identificados por un
+`session_id` de navegador (vive mientras dura la pestaña, no es una cookie
+persistente). Solo se registran si el cliente ha aceptado la categoría
+"Analítica" del banner de cookies, el mismo interruptor que activa Google
+Analytics 4 (tráfico, visitantes, procedencia). El panel admin cruza estos
+eventos con los pedidos reales en la pestaña **Métricas** (checkout
+abandonado, carritos sin checkout, valor medio, recuperación de pagos
+cancelados) — algo que GA4 no puede calcular por sí solo.
+
+---
+
+## 6. Seguridad en una mirada
 
 ```mermaid
 flowchart TB

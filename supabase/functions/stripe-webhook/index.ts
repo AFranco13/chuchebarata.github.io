@@ -57,6 +57,14 @@ Deno.serve(async (req) => {
         descripcion: 'Hemos recibido tu pago y confirmado el pedido.',
         actor: 'pago',
       });
+      // Evento de negocio para el embudo de compra (métricas del admin).
+      // session_id es un UUID de usar-y-tirar: aquí no hay sesión de
+      // navegador, por eso este evento se cruza siempre por order_id.
+      await admin.from('eventos_analitica').insert({
+        session_id: crypto.randomUUID(),
+        tipo: 'order_paid',
+        datos: { order_id: orderId, total: session.amount_total ? session.amount_total / 100 : null },
+      });
       // Descontar el stock vendido (idempotente por pedido).
       await admin.rpc('descontar_stock_pedido', { p_order_id: orderId });
     }

@@ -71,6 +71,20 @@ Estado: marca cada casilla al completarla.
 
 ---
 
+## FASE 7 — Métricas y analítica (GA4 + embudo propio)
+
+- [x] 🤖 `db/inventario-10.sql`: tabla `eventos_analitica` + RPCs de embudo/abandono/valor/recuperación.
+- [ ] 🧑 Ejecutar `inventario-10.sql` en el SQL Editor de Supabase.
+- [x] 🤖 `cookies-consent.js`: cargar GA4 (gtag.js) al aceptar la categoría "Analítica"; nuevo `tieneConsentimiento()`.
+- [x] 🤖 Nuevo `analytics.js`: sesión de navegador + `Analytics.track()`, cargado en las 16 páginas junto a `cookies-consent.js`.
+- [x] 🤖 Instrumentar eventos: `add_to_cart`, `checkout_click`, `checkout_view`, `payment_cancelled`, `order_created` (app.js, caja.js, carrito.js, checkout.js, checkout-page.js).
+- [x] 🤖 `stripe-webhook`: evento `order_paid` tras confirmar el pago.
+- [ ] 🧑 Redesplegar las Edge Functions `crear-sesion-pago` y `stripe-webhook` tras estos cambios.
+- [x] 🤖 Pestaña "Métricas" en el panel admin (admin.html + admin.js).
+- [ ] 🧑 Crear una propiedad gratuita en Google Analytics 4 y pegar el Measurement ID real en `supabase-config.js` (`gaMeasurementId`).
+
+---
+
 ## BLOQUE GO-LIVE (en paralelo)
 
 - [ ] 🧑 Rellenar datos legales `[ ]` (NIF, domicilio, contacto)

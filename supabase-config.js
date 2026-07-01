@@ -15,6 +15,11 @@ window.SUPABASE_CONFIG = {
      por si en el futuro se usa Stripe.js. */
   stripePublishableKey: 'pk_test_51TnGXQDU1gvx4Ho7vZGfpiyWH22hcQaKRLoJe80K4TvbuM3SUV79gdj35CUPBAlgNtyricZ5Oat5ug2r3LwDi2dA009YOibeDf',
 
+  /* Measurement ID de Google Analytics 4 (opcional). Crea una propiedad
+     gratuita en analytics.google.com y pega aquí su ID (G-XXXXXXXXXX).
+     Mientras sea el placeholder, no se carga ningún script de analítica. */
+  gaMeasurementId: 'G-XXXXXXXXXX',
+
   /* Pon esto en true SOLO cuando hayas desplegado las Edge Functions de
      pago y configurado los secretos (ver docs/PAGOS-STRIPE.md). Mientras esté
      en false, el pedido se crea sin cobro (modo pruebas). */

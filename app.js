@@ -229,6 +229,7 @@ function addToCart(id){
   showToast(`${p ? (p.name||p.nombre) : 'Producto'} · añadido`);
   bump();
   updateCart();
+  if(window.Analytics) Analytics.track('add_to_cart', { product_id: id });
 }
 function changeQty(id, d){
   cart[id] = (cart[id]||0) + d;
@@ -343,6 +344,7 @@ function bindEvents(){
   $('#scrim').addEventListener('click', closeCart);
   $('#checkoutBtn').addEventListener('click', () => {
     if(!Object.keys(cart).length){ showToast('Tu carrito está vacío'); return; }
+    if(window.Analytics) Analytics.track('checkout_click', { items: Object.keys(cart).length });
     location.href = 'checkout.html';
   });
 

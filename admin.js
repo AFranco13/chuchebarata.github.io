@@ -95,6 +95,7 @@
     else if (t === 'productos') renderProductos();
     else if (t === 'proveedores') renderProveedores();
     else if (t === 'compras') renderCompras();
+    else if (t === 'metricas') renderMetricas();
     else renderInformes();
   }
   tabs.forEach(b => b.addEventListener('click', () => showTab(b.dataset.tab)));
@@ -239,6 +240,87 @@
           <small>${p.n} producto${p.n!==1?'s':''} · valor stock ${eur(p.valor)}${p.plazo?` · plazo ${p.plazo} días`:''}</small></div>
         <span class="o-total">→</span>
       </button>`).join('')}</div>`;
+  }
+
+  /* ===================== MÉTRICAS ===================== */
+  // Periodo por defecto: últimos 30 días.
+  let metDesde = (() => { const d = new Date(); d.setDate(d.getDate() - 29); return ymd(d); })();
+  let metHasta = ymd(new Date());
+  let metEmbudo = [], metAbandono = null, metCarritos = null, metValor = null, metRecuperacion = null;
+
+  const ETAPAS_EMBUDO = {
+    add_to_cart: 'Añadido al carrito',
+    checkout_click: 'Clic en "Tramitar pedido"',
+    checkout_view: 'Vista de checkout',
+    payment_cancelled: 'Pago cancelado',
+    order_created: 'Pedido creado',
+    order_paid: 'Pedido pagado',
+  };
+
+  async function renderMetricas() {
+    cont.innerHTML = '<p style="color:var(--muted)">Cargando métricas…</p>';
+    [metEmbudo, metAbandono, metCarritos, metValor, metRecuperacion] = await Promise.all([
+      Auth.getInformeEmbudo(metDesde, metHasta),
+      Auth.getInformeCheckoutAbandonado(metDesde, metHasta),
+      Auth.getInformeCarritosSinCheckout(metDesde, metHasta),
+      Auth.getInformeValorCarrito(metDesde, metHasta),
+      Auth.getInformeRecuperacionPago(metDesde, metHasta),
+    ]);
+    const ab = metAbandono || { sesiones_abandonadas: 0, sesiones_con_click: 0, pct: 0 };
+    const ca = metCarritos || { sesiones_sin_checkout: 0, sesiones_con_carrito: 0, pct: 0 };
+    const va = metValor || { valor_medio_vista: 0, valor_medio_pedido: 0 };
+    const rec = metRecuperacion || { recuperadas: 0, total_cancelados: 0, pct: 0 };
+    const mapaEtapas = new Map(metEmbudo.map(e => [e.tipo, e]));
+
+    cont.innerHTML = `
+      <div class="admin-toolbar">
+        <div class="admin-filters inf-rango">
+          <label class="inv-filter">Desde <input type="date" id="metDesde" value="${metDesde}" max="${metHasta}"></label>
+          <label class="inv-filter">Hasta <input type="date" id="metHasta" value="${metHasta}" min="${metDesde}" max="${ymd(new Date())}"></label>
+        </div>
+        <button class="btn btn-ghost" id="metCSV" type="button">Exportar CSV</button>
+      </div>
+
+      <p class="empty-state" style="margin-bottom:16px">Visitas, sesiones y origen del tráfico están en
+        <a href="https://analytics.google.com" target="_blank" rel="noopener">Google Analytics</a> (GA4).
+        Aquí se muestra solo el embudo de compra, cruzado con los pedidos reales.</p>
+
+      <div class="inf-cards">
+        <div class="inf-card"><span class="inf-k">Checkout abandonado</span><b>${num(ab.sesiones_abandonadas)} (${ab.pct}%)</b></div>
+        <div class="inf-card"><span class="inf-k">Carritos sin checkout</span><b>${num(ca.sesiones_sin_checkout)} (${ca.pct}%)</b></div>
+        <div class="inf-card"><span class="inf-k">Valor medio al ver el checkout</span><b>${eur(va.valor_medio_vista)}</b></div>
+        <div class="inf-card"><span class="inf-k">Valor medio pedido creado</span><b>${eur(va.valor_medio_pedido)}</b></div>
+        <div class="inf-card"><span class="inf-k">Pagos cancelados recuperados</span><b>${num(rec.recuperadas)} de ${num(rec.total_cancelados)} (${rec.pct}%)</b></div>
+      </div>
+
+      <h3 class="inf-h">Embudo de compra</h3>
+      <div class="inv-wrap"><table class="inv-table">
+        <thead><tr><th>Etapa</th><th>Sesiones</th><th>Eventos</th></tr></thead>
+        <tbody>${Object.keys(ETAPAS_EMBUDO).map(t => {
+          const e = mapaEtapas.get(t) || { sesiones: 0, eventos: 0 };
+          return `<tr><td>${ETAPAS_EMBUDO[t]}</td><td>${num(e.sesiones)}</td><td>${num(e.eventos)}</td></tr>`;
+        }).join('')}</tbody>
+      </table></div>`;
+  }
+
+  function exportarMetricasCSV() {
+    const filas = [['Métricas El Kiosquillo', `${metDesde} a ${metHasta}`], []];
+    filas.push(['Embudo de compra']);
+    filas.push(['Etapa', 'Sesiones', 'Eventos']);
+    const mapaEtapas = new Map(metEmbudo.map(e => [e.tipo, e]));
+    Object.keys(ETAPAS_EMBUDO).forEach(t => {
+      const e = mapaEtapas.get(t) || { sesiones: 0, eventos: 0 };
+      filas.push([ETAPAS_EMBUDO[t], e.sesiones, e.eventos]);
+    });
+    filas.push([]);
+    const ab = metAbandono || {}, ca = metCarritos || {}, va = metValor || {}, rec = metRecuperacion || {};
+    filas.push(['Resumen']);
+    filas.push(['Checkout abandonado', ab.sesiones_abandonadas || 0, `${ab.pct || 0}%`]);
+    filas.push(['Carritos sin checkout', ca.sesiones_sin_checkout || 0, `${ca.pct || 0}%`]);
+    filas.push(['Valor medio al ver el checkout', va.valor_medio_vista || 0]);
+    filas.push(['Valor medio pedido creado', va.valor_medio_pedido || 0]);
+    filas.push(['Pagos cancelados recuperados', rec.recuperadas || 0, `${rec.pct || 0}%`]);
+    descargarCSV(`metricas-${metDesde}_${metHasta}.csv`, filas);
   }
 
   /* ===================== INFORMES ===================== */
@@ -507,6 +589,9 @@
     const prov = e.target.closest('.admin-prov');
     if (prov) { filtroProv = prov.dataset.prov || 'todos'; showTab('productos'); return; }
 
+    // --- Métricas ---
+    if (e.target.id === 'metCSV') { exportarMetricasCSV(); return; }
+
     // --- Informes ---
     if (e.target.id === 'infCSV') { exportarInformeCSV(); return; }
 
@@ -581,6 +666,8 @@
 
   document.addEventListener('change', e => {
     if (e.target.id === 'provFilter') { filtroProv = e.target.value; renderProductos(); }
+    if (e.target.id === 'metDesde') { metDesde = e.target.value; if (metDesde > metHasta) metHasta = metDesde; renderMetricas(); }
+    if (e.target.id === 'metHasta') { metHasta = e.target.value; if (metHasta < metDesde) metDesde = metHasta; renderMetricas(); }
     if (e.target.id === 'infDesde') { infDesde = e.target.value; if (infDesde > infHasta) infHasta = infDesde; renderInformes(); }
     if (e.target.id === 'infHasta') { infHasta = e.target.value; if (infHasta < infDesde) infDesde = infHasta; renderInformes(); }
     if (e.target.id === 'cmpProv') { compraProv = e.target.value; compraLineas = []; compraPortes = 0; renderCompras(); }

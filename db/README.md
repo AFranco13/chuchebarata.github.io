@@ -23,6 +23,7 @@ lanzarlos sin romper nada.
 | 10 | `inventario-7.sql` | Informes: `informe_resumen`, `informe_ventas_diarias`, `informe_mas_vendidos` |
 | 11 | `inventario-8.sql` | Compras a proveedor: pedidos de compra, tramos de descuento y recepción con coste medio (WAC) |
 | 12 | `inventario-9.sql` | Separa marca (atributo del producto) de proveedor; crea el proveedor real "Lekkerland" |
+| 13 | `inventario-10.sql` | `eventos_analitica` (embudo de compra) + RPCs de métricas: `informe_embudo`, `informe_checkout_abandonado`, `informe_carritos_sin_checkout`, `informe_valor_carrito`, `informe_recuperacion_pago` |
 
 ## Edge Functions
 

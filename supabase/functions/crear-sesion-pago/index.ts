@@ -90,7 +90,7 @@ Deno.serve(async (req) => {
       // Sin payment_method_types: Stripe muestra los métodos activados en tu
       // panel (tarjeta y, cuando lo actives, Bizum / Apple Pay / Google Pay).
       success_url: `${site}pedido.html?id=${order.id}&pago=ok`,
-      cancel_url: `${site}checkout.html?pago=cancelado`,
+      cancel_url: `${site}checkout.html?pago=cancelado&pedido=${order.id}`,
       client_reference_id: order.id,
       locale: 'es',
       metadata: { order_id: order.id, user_id: user.id },

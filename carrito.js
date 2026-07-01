@@ -139,6 +139,7 @@
 
   $('#checkoutBtn').addEventListener('click', () => {
     if(!Object.keys(cart).length){ showToast('Tu carrito está vacío'); return; }
+    if(window.Analytics) Analytics.track('checkout_click', { items: Object.keys(cart).length });
     location.href = 'checkout.html';
   });
 

@@ -32,6 +32,7 @@
         // 1) Crea el pedido como "pendiente" de pago.
         const pedido = await Auth.createOrder({ items, direccion, subtotal, envio, total, estado: 'pendiente' });
         if (!pedido.ok) return pedido;
+        if (global.Analytics) Analytics.track('order_created', { order_id: pedido.id, total });
         // 2) Crea la sesión de pago y redirige a Stripe.
         const pago = await Auth.crearSesionPago(pedido.id);
         if (!pago.ok) return { ok: false, error: pago.error };
@@ -40,7 +41,9 @@
       }
 
       // ---- Sin pago (modo pruebas): el pedido queda confirmado ----
-      return Auth.createOrder({ items, direccion, subtotal, envio, total });
+      const pedido = await Auth.createOrder({ items, direccion, subtotal, envio, total });
+      if (pedido.ok && global.Analytics) Analytics.track('order_created', { order_id: pedido.id, total });
+      return pedido;
     },
   };
 

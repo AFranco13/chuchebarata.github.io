@@ -99,6 +99,7 @@ function addToCart(id) {
   showToast(`${p ? (p.nombre || p.name) : 'Producto'} · añadido`);
   bump();
   updateCart();
+  if (window.Analytics) Analytics.track('add_to_cart', { product_id: id });
 }
 
 function changeQty(id, d) {
@@ -248,6 +249,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   $('#checkoutBtn').addEventListener('click', () => {
     if (!Object.keys(cart).length) { showToast('Tu carrito está vacío'); return; }
+    if (window.Analytics) Analytics.track('checkout_click', { items: Object.keys(cart).length });
     location.href = 'checkout.html';
   });
   document.addEventListener('click', e => {

@@ -328,6 +328,22 @@
       return data.map(normalizeOrder);
     },
 
+    /* ---------- analítica (embudo de compra) ---------- */
+    /* Registra un evento de negocio (añadir al carrito, clic en "Tramitar
+       pedido", pedido creado, etc.). Nunca lanza: un fallo aquí no debe
+       romper la compra (lo llama analytics.js con .catch() de todas
+       formas, pero se protege también aquí). */
+    async trackEvent(tipo, datos, sessionId) {
+      if (!sb) return;
+      try {
+        const { data } = await sb.auth.getUser().catch(() => ({ data: {} }));
+        await sb.from('eventos_analitica').insert({
+          tipo, datos: datos || {}, session_id: sessionId,
+          user_id: (data && data.user) ? data.user.id : null,
+        });
+      } catch (e) {}
+    },
+
     /* ---------- informes (admin) ---------- */
     /* Resumen del periodo: {pedidos, unidades, ingresos, coste, margen}. */
     async getInformeResumen(desde, hasta) {
@@ -349,6 +365,41 @@
       const { data, error } = await sb.rpc('informe_mas_vendidos', { p_desde: desde, p_hasta: hasta, p_limite: limite || 20 });
       if (error || !data) return [];
       return data;
+    },
+    /* Embudo de compra: [{tipo, sesiones, eventos}]. */
+    async getInformeEmbudo(desde, hasta) {
+      if (!sb) return [];
+      const { data, error } = await sb.rpc('informe_embudo', { p_desde: desde, p_hasta: hasta });
+      if (error || !data) return [];
+      return data;
+    },
+    /* Sesiones con clic en "Tramitar pedido" que nunca crearon un pedido. */
+    async getInformeCheckoutAbandonado(desde, hasta) {
+      if (!sb) return null;
+      const { data, error } = await sb.rpc('informe_checkout_abandonado', { p_desde: desde, p_hasta: hasta });
+      if (error || !data || !data.length) return null;
+      return data[0];
+    },
+    /* Sesiones con carrito que nunca llegaron a pulsar "Tramitar pedido". */
+    async getInformeCarritosSinCheckout(desde, hasta) {
+      if (!sb) return null;
+      const { data, error } = await sb.rpc('informe_carritos_sin_checkout', { p_desde: desde, p_hasta: hasta });
+      if (error || !data || !data.length) return null;
+      return data[0];
+    },
+    /* Valor medio del carrito al ver el checkout frente al pedido creado. */
+    async getInformeValorCarrito(desde, hasta) {
+      if (!sb) return null;
+      const { data, error } = await sb.rpc('informe_valor_carrito', { p_desde: desde, p_hasta: hasta });
+      if (error || !data || !data.length) return null;
+      return data[0];
+    },
+    /* De los pagos cancelados, cuántos se recuperaron (pagaron después). */
+    async getInformeRecuperacionPago(desde, hasta) {
+      if (!sb) return null;
+      const { data, error } = await sb.rpc('informe_recuperacion_pago', { p_desde: desde, p_hasta: hasta });
+      if (error || !data || !data.length) return null;
+      return data[0];
     },
 
     /* ---------- inventario (admin) ---------- */

@@ -32,14 +32,39 @@
     return c;
   }
 
-  /* Activa o desactiva scripts de terceros según el consentimiento.
-     Por ahora sólo dispara un evento; aquí se inyectarían en el futuro
-     Google Analytics (si analitica) o píxeles de marketing (si marketing). */
+  let analyticsLoaded = false;
+
+  /* Inyecta gtag.js de GA4 una sola vez, solo si hay un Measurement ID
+     real configurado (no el placeholder) y solo si hay consentimiento de
+     analítica. anonymize_ip reduce el dato personal que se envía. */
+  function cargarAnalytics() {
+    if (analyticsLoaded) return;
+    const id = (global.SUPABASE_CONFIG || {}).gaMeasurementId;
+    if (!id || id === 'G-XXXXXXXXXX') return;
+    analyticsLoaded = true;
+    const s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://www.googletagmanager.com/gtag/js?id=' + id;
+    document.head.appendChild(s);
+    global.dataLayer = global.dataLayer || [];
+    global.gtag = function () { global.dataLayer.push(arguments); };
+    global.gtag('js', new Date());
+    global.gtag('config', id, { anonymize_ip: true });
+  }
+
+  /* Activa o desactiva scripts de terceros según el consentimiento. */
   function applyConsent(c) {
     document.dispatchEvent(new CustomEvent('cookie-consent', { detail: c }));
-    // Ejemplo de uso futuro:
-    // if (c.analitica) cargarAnalytics();
+    if (c.analitica) cargarAnalytics();
   }
+
+  /* Permite a otros scripts (analytics.js) consultar el consentimiento
+     actual sin depender solo del evento 'cookie-consent'. */
+  function tieneConsentimiento(categoria) {
+    const c = readConsent();
+    return isFresh(c) && !!(c && c[categoria]);
+  }
+  global.tieneConsentimiento = tieneConsentimiento;
 
   /* ---------- interfaz ---------- */
   function el(tag, cls, html) {

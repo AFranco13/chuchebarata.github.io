@@ -251,10 +251,17 @@
     const items = pintarResumen();
     if (!items.length) { mostrarVacio(); return; }
 
+    if (window.Analytics) {
+      const { subtotal, total } = Checkout.calcularTotales(items);
+      Analytics.track('checkout_view', { items: items.length, subtotal, total });
+    }
+
     if (user) precargarFormulario(user);
 
-    if (new URLSearchParams(location.search).get('pago') === 'cancelado') {
+    const params = new URLSearchParams(location.search);
+    if (params.get('pago') === 'cancelado') {
       flash('Has cancelado el pago. Tu pedido sigue pendiente, puedes intentarlo de nuevo.', false);
+      if (window.Analytics) Analytics.track('payment_cancelled', { order_id: params.get('pedido') || null });
     }
 
     $('#checkoutForm').addEventListener('submit', onSubmit);

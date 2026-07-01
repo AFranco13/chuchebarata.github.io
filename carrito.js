@@ -137,20 +137,9 @@
     if(q){ changeQty(+q.dataset.id, +q.dataset.q); }
   });
 
-  $('#checkoutBtn').addEventListener('click', async () => {
-    if(!global.Checkout){ showToast('No se puede tramitar aquí.'); return; }
-    const res = await Checkout.tramitar({
-      cart,
-      resolve: (id, qty) => {
-        const p = resolve(id);
-        if(!p) return null;
-        return { id:+id, nombre:p.nombre, precio:p.price, cantidad:qty, img:p.img||'', tint:TINTS[p.cat]||'' };
-      },
-    });
-    if(res.reason === 'empty'){ showToast('Tu carrito está vacío'); return; }
-    if(res.reason === 'auth' || res.reason === 'redirect' || res.reason === 'address') return;
-    if(res.ok){ cart = {}; sessionStorage.removeItem('kq_cart'); updateCart(); closeCart(); location.href = 'pedido.html?id=' + res.id; return; }
-    if(res.error){ showToast(res.error); }
+  $('#checkoutBtn').addEventListener('click', () => {
+    if(!Object.keys(cart).length){ showToast('Tu carrito está vacío'); return; }
+    location.href = 'checkout.html';
   });
 
   updateCart();

@@ -341,19 +341,9 @@ function bindEvents(){
   $('#cartBtn').addEventListener('click', openCart);
   $('#cartClose').addEventListener('click', closeCart);
   $('#scrim').addEventListener('click', closeCart);
-  $('#checkoutBtn').addEventListener('click', async () => {
-    const res = await Checkout.tramitar({
-      cart,
-      resolve: (id, q) => {
-        const p = cartItemData(id);
-        if(!p) return null;
-        return { id:+id, nombre:p.name, precio:p.price, cantidad:q, img:p.img||'', tint:TINTS[p.cat]||'' };
-      },
-    });
-    if(res.reason === 'empty'){ showToast('Tu carrito está vacío'); return; }
-    if(res.reason === 'auth' || res.reason === 'redirect' || res.reason === 'address') return;   // navegando a login/Stripe/perfil
-    if(res.ok){ cart = {}; sessionStorage.removeItem('kq_cart'); updateCart(); closeCart(); location.href = 'pedido.html?id=' + res.id; return; }
-    if(res.error){ showToast(res.error); }
+  $('#checkoutBtn').addEventListener('click', () => {
+    if(!Object.keys(cart).length){ showToast('Tu carrito está vacío'); return; }
+    location.href = 'checkout.html';
   });
 
   if($('#clearCartBtn')) $('#clearCartBtn').addEventListener('click', () => {
@@ -408,10 +398,6 @@ document.addEventListener('DOMContentLoaded', () => {
   updateCart();
   bindEvents();
   initReveal();
-
-  if(new URLSearchParams(location.search).get('pago') === 'cancelado'){
-    showToast('Has cancelado el pago. Tu pedido sigue pendiente en tu cuenta.');
-  }
 
   // Escaparate desde la BD: el catálogo en vivo (altas/bajas/precio/stock)
   // sustituye al estático cuando responde; si no, se queda el de respaldo.

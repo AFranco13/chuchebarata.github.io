@@ -246,19 +246,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!confirm('¿Vaciar el carrito?')) return;
     cart = {}; sessionStorage.removeItem('kq_cart'); updateCart();
   });
-  $('#checkoutBtn').addEventListener('click', async () => {
-    const res = await Checkout.tramitar({
-      cart,
-      resolve: (id, q) => {
-        const p = PRODUCTOS_DATA.find(x => x.id == id);
-        if (!p) return null;
-        return { id: +id, nombre: p.nombre || p.name, precio: p.price, cantidad: q, img: p.img || '', tint: '' };
-      },
-    });
-    if (res.reason === 'empty') { showToast('Tu carrito está vacío'); return; }
-    if (res.reason === 'auth' || res.reason === 'redirect' || res.reason === 'address') return;   // navegando a login/Stripe/perfil
-    if (res.ok) { cart = {}; sessionStorage.removeItem('kq_cart'); updateCart(); closeCart(); location.href = 'pedido.html?id=' + res.id; return; }
-    if (res.error) { showToast(res.error); }
+  $('#checkoutBtn').addEventListener('click', () => {
+    if (!Object.keys(cart).length) { showToast('Tu carrito está vacío'); return; }
+    location.href = 'checkout.html';
   });
   document.addEventListener('click', e => {
     const q = e.target.closest('[data-q]');

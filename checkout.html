@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finalizar compra · El Kiosquillo</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="cuenta.css">
+</head>
+<body>
+
+<div class="utility">
+  <div class="container utility-in">
+    <span>Envío en 24-48 h · Gratis a partir de 49&nbsp;€</span>
+    <span class="utility-right">Atención por WhatsApp · Lun&nbsp;a&nbsp;Sáb</span>
+  </div>
+</div>
+
+<header>
+  <div class="container header-in">
+    <a href="index.html" class="brand" aria-label="El Kiosquillo, inicio">
+      <img src="images/Logo-sin-texto.png" class="brand-mark" alt="El Kiosquillo" aria-hidden="true">
+      <span class="brand-name">El Kiosquillo</span>
+    </a>
+    <nav class="nav" aria-label="Principal">
+      <a href="catalogo.html" target="_blank" rel="noopener">Chuches</a>
+      <a href="caja.html">Crea tu caja</a>
+      <a href="index.html#eventos">Fiestas y eventos</a>
+    </nav>
+    <div class="header-tools">
+      <a class="tool" href="index.html" aria-label="Volver a la tienda" title="Volver a la tienda">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14l-1.2 10.5a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8L5 7Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 7a3 3 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+      </a>
+    </div>
+  </div>
+</header>
+
+<main class="account-page">
+  <div class="container">
+    <div class="profile-head">
+      <div>
+        <h1>Finalizar compra</h1>
+        <p>Revisa tu pedido y confirma la dirección de envío.</p>
+      </div>
+    </div>
+
+    <div class="checkout-grid" id="checkoutGrid">
+      <section class="checkout-form">
+        <div class="panel-card">
+          <h2>Dirección de envío</h2>
+          <p class="card-sub">La usaremos para este pedido y la guardaremos como dirección por defecto.</p>
+          <div class="form-msg" id="checkoutMsg"></div>
+          <form id="checkoutForm">
+            <div class="field">
+              <label for="co-nombre">Nombre completo</label>
+              <input type="text" id="co-nombre" autocomplete="name">
+            </div>
+            <div class="field">
+              <label for="co-tel">Teléfono (opcional)</label>
+              <input type="tel" id="co-tel" autocomplete="tel">
+            </div>
+            <div class="field">
+              <label for="co-linea1">Dirección</label>
+              <input type="text" id="co-linea1" autocomplete="address-line1" placeholder="Calle, número">
+            </div>
+            <div class="field">
+              <label for="co-linea2">Piso, puerta, etc. (opcional)</label>
+              <input type="text" id="co-linea2" autocomplete="address-line2">
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label for="co-cp">Código postal</label>
+                <input type="text" id="co-cp" autocomplete="postal-code">
+              </div>
+              <div class="field">
+                <label for="co-ciudad">Ciudad</label>
+                <input type="text" id="co-ciudad" autocomplete="address-level2">
+              </div>
+            </div>
+            <div class="field">
+              <label for="co-provincia">Provincia</label>
+              <input type="text" id="co-provincia" autocomplete="address-level1">
+            </div>
+            <button type="submit" class="btn btn-primary btn-block" id="checkoutSubmit">Continuar</button>
+          </form>
+        </div>
+      </section>
+
+      <aside class="checkout-summary">
+        <div class="panel-card">
+          <h2>Tu pedido</h2>
+          <div class="ship">
+            <p id="shipMsg"></p>
+            <div class="ship-track"><div class="ship-fill" id="shipFill"></div></div>
+          </div>
+          <div class="cart-items" id="checkoutItems"></div>
+          <div class="cart-total"><span>Total · IVA incl.</span><b id="checkoutTotal">0,00 €</b></div>
+        </div>
+      </aside>
+    </div>
+
+    <div class="empty-state" id="checkoutEmpty" hidden>
+      <b>Tu carrito está vacío</b>
+      Añade algo dulce antes de tramitar un pedido.
+      <div style="margin-top:16px"><a class="btn btn-primary" href="index.html">Ir a la tienda</a></div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container footer-bottom">
+    <span>© 2026 El Kiosquillo · chuchebarata.com</span>
+    <span><a href="aviso-legal.html">Aviso legal</a> · <a href="privacidad.html">Privacidad</a> · <a href="cookies.html">Cookies</a></span>
+  </div>
+</footer>
+
+<div class="toast" id="toast"><span id="toastMsg"></span></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="auth.js"></script>
+<script src="sesion.js"></script>
+<script src="cookies-consent.js"></script>
+<script src="productos_data.js"></script>
+<script src="checkout.js"></script>
+<script src="checkout-page.js"></script>
+</body>
+</html>

@@ -16,6 +16,7 @@ flowchart TB
     Admin["Panel admin<br/>admin.html"]
     Carrito["Carrito<br/>sessionStorage 'kq_cart'"]
     AuthJS["auth.js<br/>cliente Supabase + API"]
+    CheckoutPage["checkout.html<br/>dirección de envío + resumen"]
     CheckoutJS["checkout.js<br/>orquesta pedido y pago"]
   end
 
@@ -34,7 +35,8 @@ flowchart TB
   Tienda --> Carrito
   Cuenta --> AuthJS
   Admin --> AuthJS
-  Carrito --> CheckoutJS
+  Carrito -->|"Tramitar pedido"| CheckoutPage
+  CheckoutPage --> CheckoutJS
   CheckoutJS --> AuthJS
   AuthJS <-->|"login / perfil"| AuthSB
   AuthJS <-->|"pedidos / seguimiento"| DB
@@ -58,10 +60,13 @@ sequenceDiagram
   participant ST as Stripe
 
   C->>Web: Añade productos y pulsa "Tramitar pedido"
-  Web->>SB: ¿Hay sesión? ¿Dirección completa?
-  alt Falta sesión o dirección
-    Web-->>C: Redirige a login.html o perfil.html
-  else Todo correcto
+  Web->>SB: ¿Hay sesión?
+  alt Sin sesión
+    Web-->>C: Redirige a login.html (returnTo=checkout.html)
+  else Con sesión
+    Web-->>C: Muestra checkout.html (resumen del pedido + dirección precargada)
+    C->>Web: Revisa/edita la dirección y pulsa "Continuar"
+    Web->>SB: Guarda la dirección en el perfil (no bloquea si falla)
     Web->>SB: crear_pedido (estado = pendiente)
     Web->>EF: crear-sesion-pago(orderId)
     EF->>SB: Lee los importes del pedido (fuente de verdad)
@@ -69,10 +74,14 @@ sequenceDiagram
     EF-->>Web: Devuelve la URL de pago
     Web->>ST: Redirige a la página de Stripe
     C->>ST: Paga (tarjeta / Bizum)
-    ST-->>Web: Vuelve a pedido.html (pago=ok) y vacía el carrito
-    ST->>EF: webhook checkout.session.completed
-    EF->>SB: estado = confirmado + evento de seguimiento
-    Note over C,SB: El cliente ve "Confirmado" y su seguimiento
+    alt Pago completado
+      ST-->>Web: Vuelve a pedido.html (pago=ok) y vacía el carrito
+      ST->>EF: webhook checkout.session.completed
+      EF->>SB: estado = confirmado + evento de seguimiento
+      Note over C,SB: El cliente ve "Confirmado" y su seguimiento
+    else Pago cancelado
+      ST-->>Web: Vuelve a checkout.html (pago=cancelado), pedido sigue pendiente
+    end
   end
 ```
 

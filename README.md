@@ -14,7 +14,10 @@ datos, funciones) y pagos con **Stripe Checkout**.
 ├── app.js                 Portada / catálogo
 ├── producto.js            Ficha de producto
 ├── caja.js                Montar caja de chuches
-├── carrito.js, checkout.js, pedido.js   Carrito y proceso de compra
+├── carrito.js             Cajón del carrito (en portada, caja y ficha de producto)
+├── checkout.js            Lógica compartida de pedido/pago (totales, crear pedido, sesión de Stripe)
+├── checkout.html, checkout-page.js   Página de checkout (dirección de envío + resumen)
+├── pedido.js              Confirmación de pedido
 ├── auth.js                Cliente de Supabase + capa de datos (window.Auth)
 ├── perfil.js, sesion.js   Cuenta de usuario y sesión
 ├── admin.js               Panel de administración

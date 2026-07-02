@@ -131,6 +131,60 @@
     el.classList.add(ok ? 'ok' : 'error', 'show');
   }
 
+  function flashLogin(msg, ok) {
+    const el = $('#loginMsg');
+    el.textContent = msg;
+    el.classList.remove('ok', 'error');
+    el.classList.add(ok ? 'ok' : 'error', 'show');
+  }
+
+  /* Conmuta, dentro de la misma vista (con el resumen a la derecha), entre
+     el formulario de "Crea tu cuenta" y el de "Inicia sesión". */
+  function mostrarLogin(prefillEmail) {
+    $('#checkoutForm').hidden = true;
+    $('#loginForm').hidden = false;
+    if (prefillEmail) $('#lo-email').value = prefillEmail;
+    ($('#lo-email').value ? $('#lo-password') : $('#lo-email')).focus();
+  }
+  function mostrarRegistro() {
+    $('#loginForm').hidden = true;
+    $('#checkoutForm').hidden = false;
+  }
+
+  /* Tras iniciar sesión (o crear la cuenta) sin salir del checkout: oculta
+     los campos de invitado y deja el formulario como cliente autenticado. */
+  function entrarComoUsuario(user) {
+    modoInvitado = false;
+    document.querySelectorAll('.guest-only').forEach(el => { el.hidden = true; });
+    $('#loginForm').hidden = true;
+    $('#checkoutForm').hidden = false;
+    $('#checkoutTitle').textContent = 'Dirección de envío';
+    $('#checkoutSub').textContent = 'La usaremos para este pedido y la guardaremos como dirección por defecto.';
+    if (user) precargarFormulario(user);
+  }
+
+  async function onLogin(e) {
+    e.preventDefault();
+    const email = $('#lo-email').value.trim();
+    const password = $('#lo-password').value;
+    if (!email || !password) { flashLogin('Escribe tu correo y tu contraseña.', false); return; }
+
+    const btn = $('#loginSubmit');
+    btn.disabled = true;
+    const txt = btn.textContent;
+    btn.textContent = 'Entrando…';
+
+    const res = await Auth.login({ email, password });
+    if (!res.ok) {
+      btn.disabled = false;
+      btn.textContent = txt;
+      flashLogin(res.error || 'No se ha podido iniciar sesión.', false);
+      return;
+    }
+    const user = await Auth.getCurrentUser();
+    entrarComoUsuario(user);
+  }
+
   function validarFormulario() {
     const requeridos = ['co-nombre', 'co-linea1', 'co-cp', 'co-ciudad', 'co-provincia'];
     if (modoInvitado) requeridos.unshift('co-email', 'co-password', 'co-password2');
@@ -214,7 +268,7 @@
         btn.textContent = textoOriginal;
         if (/ya existe una cuenta/i.test(alta.error || '')) {
           $('#co-email').closest('.field').classList.add('invalid');
-          flash('Ya existe una cuenta con ese correo. <a href="login.html?returnTo=checkout.html">Inicia sesión</a> para continuar con tu pedido.', false, true);
+          flash('Ya existe una cuenta con ese correo. <a href="#" data-action="login">Inicia sesión</a> para continuar con tu pedido.', false, true);
         } else {
           flash(alta.error || 'No se ha podido crear la cuenta.', false);
         }
@@ -291,6 +345,16 @@
     }
 
     $('#checkoutForm').addEventListener('submit', onSubmit);
+    $('#loginForm').addEventListener('submit', onLogin);
+
+    // Conmutación login/registro dentro de la misma vista (no navega).
+    document.addEventListener('click', e => {
+      const a = e.target.closest('[data-action]');
+      if (!a) return;
+      e.preventDefault();
+      if (a.dataset.action === 'login') mostrarLogin($('#co-email').value.trim());
+      else if (a.dataset.action === 'registro') mostrarRegistro();
+    });
 
     document.addEventListener('click', e => {
       const q = e.target.closest('[data-q]');

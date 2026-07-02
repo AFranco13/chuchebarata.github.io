@@ -55,7 +55,7 @@
           <div class="panel-card">
             <h2 id="checkoutTitle">Dirección de envío</h2>
             <p class="card-sub" id="checkoutSub">La usaremos para este pedido y la guardaremos como dirección por defecto.</p>
-            <p class="guest-login guest-only" id="guestLogin" hidden>¿Ya tienes cuenta? <a href="login.html?returnTo=checkout.html">Inicia sesión</a></p>
+            <p class="guest-login guest-only" id="guestLogin" hidden>¿Ya tienes cuenta? <a href="#" data-action="login">Inicia sesión</a></p>
             <div class="form-msg" id="checkoutMsg"></div>
 
             <div class="field guest-only" id="fieldEmail" hidden>
@@ -115,6 +115,25 @@
             </div>
 
             <button type="submit" class="btn btn-primary btn-block" id="checkoutSubmit">Continuar</button>
+          </div>
+        </form>
+
+        <form id="loginForm" novalidate hidden>
+          <div class="panel-card">
+            <h2>Inicia sesión</h2>
+            <p class="card-sub">Entra con tu cuenta para completar el pedido.</p>
+            <p class="guest-login">¿No tienes cuenta? <a href="#" data-action="registro">Créala aquí</a></p>
+            <div class="form-msg" id="loginMsg"></div>
+            <div class="field">
+              <label for="lo-email">Correo electrónico</label>
+              <input type="email" id="lo-email" autocomplete="email">
+            </div>
+            <div class="field">
+              <label for="lo-password">Contraseña</label>
+              <input type="password" id="lo-password" autocomplete="current-password">
+            </div>
+            <p class="login-forgot"><a href="recuperar.html" class="muted-link">¿Olvidaste tu contraseña?</a></p>
+            <button type="submit" class="btn btn-primary btn-block" id="loginSubmit">Entrar</button>
           </div>
         </form>
       </section>

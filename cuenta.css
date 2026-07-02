@@ -105,6 +105,7 @@
   background:#fff;font-family:var(--sans);font-size:.98rem;outline:none;transition:border-color .18s}
 .field input:focus,.field textarea:focus{border-color:var(--wine)}
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.field-hint{display:block;margin-top:6px;font-size:.8rem;color:var(--muted)}
 .consent{display:flex;gap:10px;align-items:flex-start;margin-bottom:12px;font-size:.86rem;color:var(--muted)}
 .consent input{margin-top:3px;width:17px;height:17px;flex-shrink:0;accent-color:var(--wine)}
 .consent a{color:var(--wine);text-decoration:underline}

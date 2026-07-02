@@ -133,7 +133,7 @@
 
   function validarFormulario() {
     const requeridos = ['co-nombre', 'co-linea1', 'co-cp', 'co-ciudad', 'co-provincia'];
-    if (modoInvitado) requeridos.unshift('co-email', 'co-password');
+    if (modoInvitado) requeridos.unshift('co-email', 'co-password', 'co-password2');
     document.querySelectorAll('.field.invalid').forEach(f => f.classList.remove('invalid'));
     let primero = null;
     requeridos.forEach(id => {
@@ -141,7 +141,6 @@
       const val = input.value.trim();
       let invalido = !val;
       if (id === 'co-email' && val && !EMAIL_RE.test(val)) invalido = true;
-      if (id === 'co-password' && val && val.length < 6) invalido = true;
       if (invalido) {
         input.closest('.field').classList.add('invalid');
         if (!primero) primero = input;
@@ -149,6 +148,25 @@
     });
     if (primero) { primero.focus(); return false; }
     return true;
+  }
+
+  /* Valida la contraseña del alta (fortaleza + repetición). Devuelve un
+     mensaje de error o null si es correcta; marca el campo problemático. */
+  function validarPasswordInvitado() {
+    const pw = $('#co-password').value;
+    const pw2 = $('#co-password2').value;
+    const val = Auth.validarPassword(pw);
+    if (!val.ok) {
+      $('#co-password').closest('.field').classList.add('invalid');
+      $('#co-password').focus();
+      return val.error;
+    }
+    if (pw !== pw2) {
+      $('#co-password2').closest('.field').classList.add('invalid');
+      $('#co-password2').focus();
+      return 'Las contraseñas no coinciden.';
+    }
+    return null;
   }
 
   async function onSubmit(e) {
@@ -161,6 +179,10 @@
     if (!validarFormulario()) {
       flash('Completa los campos obligatorios.', false);
       return;
+    }
+    if (modoInvitado) {
+      const errPw = validarPasswordInvitado();
+      if (errPw) { flash(errPw, false); return; }
     }
 
     const btn = $('#checkoutSubmit');

@@ -51,7 +51,7 @@
 
     <div class="checkout-grid" id="checkoutGrid">
       <section class="checkout-form">
-        <form id="checkoutForm">
+        <form id="checkoutForm" novalidate>
           <div class="panel-card">
             <h2 id="checkoutTitle">Dirección de envío</h2>
             <p class="card-sub" id="checkoutSub">La usaremos para este pedido y la guardaremos como dirección por defecto.</p>
@@ -95,7 +95,12 @@
 
             <div class="field guest-only" id="fieldPassword" hidden>
               <label for="co-password">Contraseña</label>
-              <input type="password" id="co-password" autocomplete="new-password" minlength="6">
+              <input type="password" id="co-password" autocomplete="new-password" minlength="8">
+              <small class="field-hint">Mínimo 8 caracteres, con letras y números.</small>
+            </div>
+            <div class="field guest-only" id="fieldPassword2" hidden>
+              <label for="co-password2">Repite la contraseña</label>
+              <input type="password" id="co-password2" autocomplete="new-password" minlength="8">
             </div>
 
             <div class="guest-only" id="guestConsents" hidden>

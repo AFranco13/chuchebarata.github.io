@@ -97,6 +97,18 @@
       return u;
     },
 
+    /* Política de contraseña (segura pero no excesivamente estricta):
+       mínimo 8 caracteres, con al menos una letra y un número. Se usa en
+       el alta, el cambio de contraseña y el restablecimiento. */
+    validarPassword(password) {
+      password = password || '';
+      if (password.length < 8) return { ok: false, error: 'La contraseña debe tener al menos 8 caracteres.' };
+      if (!/[a-zA-Z]/.test(password) || !/[0-9]/.test(password)) {
+        return { ok: false, error: 'La contraseña debe incluir letras y números.' };
+      }
+      return { ok: true };
+    },
+
     /* ---------- alta ---------- */
     async register({ nombre, email, password, marketing }) {
       if (!sb) return { ok: false, error: 'Servicio no disponible.' };
@@ -104,13 +116,21 @@
       email = (email || '').trim().toLowerCase();
       if (nombre.length < 2)     return { ok: false, error: 'Indica tu nombre.' };
       if (!EMAIL_RE.test(email))  return { ok: false, error: 'El correo no es válido.' };
-      if (!password || password.length < 6) return { ok: false, error: 'La contraseña debe tener al menos 6 caracteres.' };
+      const val = this.validarPassword(password);
+      if (!val.ok) return val;
 
       const { data, error } = await sb.auth.signUp({
         email, password,
         options: { data: { nombre, marketing: !!marketing } },
       });
       if (error) return { ok: false, error: traducir(error) };
+      // Correo ya registrado: con la confirmación de correo activada,
+      // Supabase NO devuelve error (para no revelar qué correos existen),
+      // sino un usuario "vacío" con identities: []. Lo detectamos para
+      // invitar a iniciar sesión, en vez de mostrar un falso "cuenta creada".
+      if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+        return { ok: false, error: 'Ya existe una cuenta con ese correo.' };
+      }
       // Si el proyecto exige confirmar el correo, no habrá sesión todavía.
       return { ok: true, needsConfirm: !data.session };
     },
@@ -140,7 +160,8 @@
     /* Fija una nueva contraseña (tras seguir el enlace del correo). */
     async setNewPassword(nueva) {
       if (!sb) return { ok: false, error: 'Servicio no disponible.' };
-      if (!nueva || nueva.length < 6) return { ok: false, error: 'La contraseña debe tener al menos 6 caracteres.' };
+      const val = this.validarPassword(nueva);
+      if (!val.ok) return val;
       const { error } = await sb.auth.updateUser({ password: nueva });
       return error ? { ok: false, error: traducir(error) } : { ok: true };
     },
@@ -158,7 +179,8 @@
 
     async changePassword(actual, nueva) {
       if (!sb) return { ok: false, error: 'Servicio no disponible.' };
-      if (!nueva || nueva.length < 6) return { ok: false, error: 'La nueva contraseña debe tener al menos 6 caracteres.' };
+      const val = this.validarPassword(nueva);
+      if (!val.ok) return { ok: false, error: val.error };
       const { data: { user } } = await sb.auth.getUser();
       if (!user) return { ok: false, error: 'Sesión no iniciada.' };
       // Verifica la contraseña actual reautenticando.

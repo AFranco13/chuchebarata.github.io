@@ -65,7 +65,12 @@
   const pagoOk = new URLSearchParams(location.search).get('pago') === 'ok';
   // El pago se ha completado: vacía el carrito (se conservaba por si el
   // cliente cancelaba en Stripe y quería recuperarlo).
-  if (pagoOk) { try { sessionStorage.removeItem('kq_cart'); } catch {} }
+  if (pagoOk) {
+    try { sessionStorage.removeItem('kq_cart'); } catch {}
+    // Refresca el icono del carrito para que no siga mostrándose "lleno"
+    // (carrito.js ya lo había pintado con los productos antes de vaciarlo).
+    if (window.Carrito) window.Carrito.refresh();
+  }
   const avisoPago = pagoOk
     ? `<div class="form-msg ok show" style="margin-bottom:18px">¡Pago recibido! Tu pedido está confirmado. Te avisaremos cuando salga.</div>`
     : '';

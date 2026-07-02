@@ -144,4 +144,8 @@
   });
 
   updateCart();
+
+  // Permite a otras páginas (p. ej. pedido.js tras confirmarse un pago)
+  // refrescar el contador del icono cuando vacían el carrito por su cuenta.
+  global.Carrito = { refresh: updateCart };
 })(window);

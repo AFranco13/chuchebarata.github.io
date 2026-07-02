@@ -206,7 +206,7 @@
       }
       // Sesión iniciada automáticamente: seguimos como cliente ya autenticado.
       modoInvitado = false;
-      $('#guestPanel').hidden = true;
+      document.querySelectorAll('.guest-only').forEach(el => { el.hidden = true; });
     }
 
     // Guarda el perfil de cara a futuros pedidos; si falla, no bloquea la
@@ -245,7 +245,11 @@
     // (incluida la contraseña) y la cuenta se crea al confirmar el pedido.
     const user = await Auth.getCurrentUser();
     modoInvitado = !user;
-    if (modoInvitado) $('#guestPanel').hidden = false;
+    if (modoInvitado) {
+      $('#checkoutTitle').textContent = 'Crea tu cuenta';
+      $('#checkoutSub').textContent = 'Rellena tus datos y crea una contraseña; usaremos la dirección para enviarte el pedido.';
+      document.querySelectorAll('.guest-only').forEach(el => { el.hidden = false; });
+    }
 
     await resolverCatalogo();
     const items = pintarResumen();

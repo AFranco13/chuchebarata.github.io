@@ -52,31 +52,16 @@
     <div class="checkout-grid" id="checkoutGrid">
       <section class="checkout-form">
         <form id="checkoutForm">
-          <div class="panel-card" id="guestPanel" hidden>
-            <h2>Tu cuenta</h2>
-            <p class="card-sub">Crea una contraseña para tu cuenta y sigue tu pedido después. <a href="login.html?returnTo=checkout.html">¿Ya tienes cuenta? Inicia sesión</a></p>
-            <div class="field">
+          <div class="panel-card">
+            <h2 id="checkoutTitle">Dirección de envío</h2>
+            <p class="card-sub" id="checkoutSub">La usaremos para este pedido y la guardaremos como dirección por defecto.</p>
+            <p class="guest-login guest-only" id="guestLogin" hidden>¿Ya tienes cuenta? <a href="login.html?returnTo=checkout.html">Inicia sesión</a></p>
+            <div class="form-msg" id="checkoutMsg"></div>
+
+            <div class="field guest-only" id="fieldEmail" hidden>
               <label for="co-email">Correo electrónico</label>
               <input type="email" id="co-email" autocomplete="email">
             </div>
-            <div class="field">
-              <label for="co-password">Contraseña</label>
-              <input type="password" id="co-password" autocomplete="new-password" minlength="6">
-            </div>
-            <label class="consent">
-              <input type="checkbox" id="co-legal">
-              <span>He leído y acepto la <a href="privacidad.html" target="_blank">Política de Privacidad</a> y los <a href="terminos.html" target="_blank">Términos y Condiciones</a>. <b>*</b></span>
-            </label>
-            <label class="consent">
-              <input type="checkbox" id="co-edad">
-              <span>Confirmo que tengo 14 años o más. <b>*</b></span>
-            </label>
-          </div>
-
-          <div class="panel-card">
-            <h2>Dirección de envío</h2>
-            <p class="card-sub">La usaremos para este pedido y la guardaremos como dirección por defecto.</p>
-            <div class="form-msg" id="checkoutMsg"></div>
             <div class="field">
               <label for="co-nombre">Nombre completo</label>
               <input type="text" id="co-nombre" autocomplete="name">
@@ -107,6 +92,23 @@
               <label for="co-provincia">Provincia</label>
               <input type="text" id="co-provincia" autocomplete="address-level1">
             </div>
+
+            <div class="field guest-only" id="fieldPassword" hidden>
+              <label for="co-password">Contraseña</label>
+              <input type="password" id="co-password" autocomplete="new-password" minlength="6">
+            </div>
+
+            <div class="guest-only" id="guestConsents" hidden>
+              <label class="consent">
+                <input type="checkbox" id="co-legal">
+                <span>He leído y acepto la <a href="privacidad.html" target="_blank">Política de Privacidad</a> y los <a href="terminos.html" target="_blank">Términos y Condiciones</a>. <b>*</b></span>
+              </label>
+              <label class="consent">
+                <input type="checkbox" id="co-edad">
+                <span>Confirmo que tengo 14 años o más. <b>*</b></span>
+              </label>
+            </div>
+
             <button type="submit" class="btn btn-primary btn-block" id="checkoutSubmit">Continuar</button>
           </div>
         </form>

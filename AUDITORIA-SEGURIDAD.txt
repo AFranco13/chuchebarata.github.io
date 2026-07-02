@@ -1,0 +1,147 @@
+================================================================
+ EL KIOSQUILLO · AUDITORÍA DE SEGURIDAD Y RENDIMIENTO
+ Fecha: 2026-07-02
+ Alcance: esquema Supabase (SQL/RLS/RPC), Edge Functions (Stripe),
+          frontend estático (HTML/JS), flujo de compra y analítica.
+================================================================
+
+Resumen: la arquitectura está, en general, bien planteada. Los puntos
+fuertes: RLS activa en todas las tablas, RPCs de escritura protegidos
+con is_admin(), precios "blindados" en servidor para productos reales,
+todas las funciones SECURITY DEFINER con `set search_path`, sin SQL
+dinámico (no hay inyección SQL), y sin claves secretas en el repositorio.
+Los hallazgos siguientes son mejoras, no brechas críticas abiertas.
+
+Leyenda de severidad: [ALTA] [MEDIA] [BAJA] [INFO/REND.]
+
+----------------------------------------------------------------
+1. [MEDIA] Tabla eventos_analitica: INSERT sin restricción de identidad
+----------------------------------------------------------------
+Archivo: db/inventario-10.sql
+La política RLS de inserción es `with check (true)` y se concede INSERT a
+`anon, authenticated`. Consecuencias:
+  - Un cliente puede insertar filas atribuidas a CUALQUIER user_id (no se
+    valida que user_id = auth.uid()). auth.js->trackEvent rellena el
+    user_id correcto, pero nada lo obliga a nivel de base de datos: una
+    petición manual al endpoint REST puede falsear user_id y session_id.
+  - Se pueden inyectar eventos 'order_paid'/'order_created' arbitrarios
+    (el tipo está en la allowlist) y así envenenar las métricas del panel
+    (embudo, recuperación de pago, abandono).
+  - Sin límite de volumen: un bot anónimo puede inflar la tabla (coste de
+    almacenamiento / ruido en informes).
+Impacto: integridad de las métricas (no expone datos de terceros; la
+tabla no tiene SELECT para anon/authenticated).
+Recomendación: endurecer el `with check` a
+  `(user_id is null or user_id = auth.uid())`
+y valorar un rate-limit o una retención (purga de filas > 13 meses, ya
+prevista como intención en el plan).
+
+----------------------------------------------------------------
+2. [MEDIA] XSS almacenado potencial vía nombre/img de producto
+----------------------------------------------------------------
+Archivos: app.js (renderProducts ~138, carrito ~260), caja.js (~203),
+          checkout-page.js (pintarResumen ~81), carrito.js (~100)
+Los campos `nombre`, `img`, `meta` del catálogo se interpolan en
+innerHTML SIN escapar (a diferencia de pedido.js y admin.js, que sí usan
+`esc()`). Como la tabla products es admin-only, explotarlo requiere una
+cuenta de administrador comprometida o una escritura directa en BD; no es
+explotable por un cliente normal. Aun así es una inconsistencia de
+saneamiento que conviene cerrar.
+Recomendación: aplicar la misma función `esc()` que ya existe en
+pedido.js/admin.js a nombre/img/meta en esos render, y añadir una CSP
+(ver punto 4) como segunda capa.
+
+----------------------------------------------------------------
+3. [MEDIA-BAJA] crear_pedido confía en el precio del cliente para IDs
+   desconocidos
+----------------------------------------------------------------
+Archivo: db/inventario-2.sql (líneas 44-49)
+Para productos reales (id existente en products) el precio se toma de la
+BD (correcto, blindado). Pero si el id NO existe, hay un fallback que usa
+el `precio` enviado por el navegador. Un cliente puede crear pedidos con
+importes arbitrarios para IDs inventados (p. ej. price=0). No permite
+comprar productos REALES por debajo de su precio (esos van por la rama
+blindada), así que el impacto real es limitado, pero permite generar
+pedidos "basura" a precio manipulado.
+Recomendación: si el producto no existe en products, rechazar la línea
+(raise exception) en vez de aceptar el precio del cliente.
+
+----------------------------------------------------------------
+4. [BAJA] Sin Content-Security-Policy
+----------------------------------------------------------------
+No hay CSP (ni cabecera ni <meta http-equiv>). Una CSP restrictiva
+(script-src propio + dominios de Supabase/Stripe/GA, sin 'unsafe-inline'
+en lo posible) mitigaría los vectores de innerHTML del punto 2 y limitaría
+el daño de cualquier inyección. En GitHub Pages puede añadirse vía
+<meta http-equiv="Content-Security-Policy" ...> en el <head>.
+
+----------------------------------------------------------------
+5. [BAJA] crear-sesion-pago: URLs de retorno controladas por el cliente
+----------------------------------------------------------------
+Archivo: supabase/functions/crear-sesion-pago/index.ts (~46, 92-93)
+`site` se toma del parámetro `base` que envía el navegador, sin validar
+contra un allowlist de dominios. success_url/cancel_url se construyen con
+él, así que podrían apuntar fuera del dominio propio. El alcance es
+limitado (la sesión de Stripe está ligada al pedido del propio usuario,
+no permite atacar a terceros), pero conviene validar que `base` coincide
+con el dominio esperado o ignorarlo y usar una constante del servidor.
+
+----------------------------------------------------------------
+6. [BAJA] CORS abierto (Access-Control-Allow-Origin: *) en Edge Functions
+----------------------------------------------------------------
+Archivos: supabase/functions/crear-sesion-pago/index.ts (~21-25),
+          stripe-webhook (no aplica CORS, es servidor-a-servidor).
+crear-sesion-pago exige cabecera Authorization (bearer JWT), por lo que el
+'*' no habilita ataques con credenciales de cookie; riesgo bajo. Aun así,
+restringir el origen al dominio de la tienda reduce la superficie.
+
+----------------------------------------------------------------
+7. [BAJA] crear_producto usa max(id)+1 (condición de carrera)
+----------------------------------------------------------------
+Archivo: db/inventario-3.sql (~42)
+`select coalesce(max(id),0)+1` no es seguro ante altas concurrentes de dos
+administradores (colisión de clave primaria). Poco probable con un único
+admin, pero conviene migrar el id de products a una secuencia/serial.
+
+----------------------------------------------------------------
+8. [BAJA] Sin control de stock al crear el pedido 'pendiente'
+----------------------------------------------------------------
+El stock solo se descuenta en el webhook al confirmarse el pago; crear el
+pedido no reserva ni valida existencias. Permite sobreventa (dos clientes
+compran la última unidad a la vez). Es más un tema de negocio que de
+seguridad; valorar reserva temporal de stock al iniciar el pago.
+
+----------------------------------------------------------------
+9. [REND.] getAllOrders sin paginación
+----------------------------------------------------------------
+Archivo: auth.js (~321)
+`select *, order_items(*)` sobre TODOS los pedidos sin limit/paginación.
+A medida que crezcan los pedidos, la pantalla de admin cargará cada vez
+más lento y más datos. Recomendación: paginar (range/limit) y/o filtrar
+por estado en el servidor en vez de traer todo y filtrar en cliente.
+
+----------------------------------------------------------------
+10. [REND.] Recursos de terceros por CDN sin SRI
+----------------------------------------------------------------
+supabase-js y las fuentes de Google se cargan por CDN sin atributo
+integrity (SRI). Un compromiso del CDN podría inyectar código. Añadir SRI
+donde el proveedor lo permita, o autohospedar (ya previsto para las
+fuentes en el BLOQUE GO-LIVE del plan).
+
+----------------------------------------------------------------
+11. [INFO] Credenciales públicas en el repositorio (correcto)
+----------------------------------------------------------------
+supabase-config.js versiona la anon key de Supabase y la clave publicable
+de Stripe. Es correcto y esperado: son claves PÚBLICAS de navegador. Se ha
+confirmado que NO hay service_role ni claves secretas (sk_...) en el
+repositorio; viven solo como secretos de las Edge Functions. Sin acción.
+
+================================================================
+ PRIORIZACIÓN SUGERIDA
+================================================================
+ 1º  Punto 1  (RLS de eventos_analitica: restringir user_id)
+ 2º  Punto 2  (escapar nombre/img en los render de carrito/catálogo)
+ 3º  Punto 3  (crear_pedido: rechazar IDs de producto desconocidos)
+ 4º  Punto 4  (añadir CSP como capa de defensa)
+ 5º  Puntos 5-10 (endurecimiento y rendimiento, sin urgencia)
+================================================================
